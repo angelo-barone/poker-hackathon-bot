@@ -15,3 +15,9 @@ short stacks), opponent counters, postflop equity by simulation, equity against 
 
 Reliability over 64,182 decisions: 0 crashes, 0 timeouts, 0 actions corrected by the engine.
 Slowest decision 79 ms (budget 200 ms, limit 2,000 ms). Validator: passed.
+
+## Entry folder renamed (Nov 21, 11:10)
+
+`my_bots/v1` is now `my_bots/im_just_in_mech_eng` (the team name on the submission form). No strategy
+change; only `"data_ok"` was added to the debug output. New versions are developed elsewhere and copied
+in only when they beat the current entry. `sparring/v1_frozen` is the benchmark copy.

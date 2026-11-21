@@ -1,0 +1,198 @@
+{
+ "pairs": 1000,
+ "seed": 1,
+ "rows": [
+  {
+   "range": "top 5%",
+   "weakest": "AJs",
+   "win_rate": 0.6175,
+   "ci95": [
+    0.596,
+    0.6386
+   ],
+   "pairings": {
+    "win": 369,
+    "draw": 497,
+    "loss": 134
+   },
+   "avg_hands": 41.8,
+   "matches": 2000
+  },
+  {
+   "range": "top 10%",
+   "weakest": "KJs",
+   "win_rate": 0.663,
+   "ci95": [
+    0.642,
+    0.6834
+   ],
+   "pairings": {
+    "win": 429,
+    "draw": 468,
+    "loss": 103
+   },
+   "avg_hands": 18.8,
+   "matches": 2000
+  },
+  {
+   "range": "top 15%",
+   "weakest": "A5s",
+   "win_rate": 0.6455,
+   "ci95": [
+    0.6243,
+    0.6662
+   ],
+   "pairings": {
+    "win": 398,
+    "draw": 495,
+    "loss": 107
+   },
+   "avg_hands": 12.2,
+   "matches": 2000
+  },
+  {
+   "range": "top 20%",
+   "weakest": "QJo",
+   "win_rate": 0.6225,
+   "ci95": [
+    0.601,
+    0.6435
+   ],
+   "pairings": {
+    "win": 368,
+    "draw": 509,
+    "loss": 123
+   },
+   "avg_hands": 8.7,
+   "matches": 2000
+  },
+  {
+   "range": "top 30%",
+   "weakest": "J9s",
+   "win_rate": 0.6105,
+   "ci95": [
+    0.5889,
+    0.6316
+   ],
+   "pairings": {
+    "win": 344,
+    "draw": 533,
+    "loss": 123
+   },
+   "avg_hands": 5.8,
+   "matches": 2000
+  },
+  {
+   "range": "top 40%",
+   "weakest": "J7s",
+   "win_rate": 0.5895,
+   "ci95": [
+    0.5678,
+    0.6109
+   ],
+   "pairings": {
+    "win": 296,
+    "draw": 587,
+    "loss": 117
+   },
+   "avg_hands": 4.0,
+   "matches": 2000
+  },
+  {
+   "range": "top 50%",
+   "weakest": "J5s",
+   "win_rate": 0.5705,
+   "ci95": [
+    0.5487,
+    0.592
+   ],
+   "pairings": {
+    "win": 259,
+    "draw": 623,
+    "loss": 118
+   },
+   "avg_hands": 3.1,
+   "matches": 2000
+  },
+  {
+   "range": "top 60%",
+   "weakest": "J2s",
+   "win_rate": 0.563,
+   "ci95": [
+    0.5412,
+    0.5846
+   ],
+   "pairings": {
+    "win": 221,
+    "draw": 684,
+    "loss": 95
+   },
+   "avg_hands": 2.4,
+   "matches": 2000
+  },
+  {
+   "range": "top 70%",
+   "weakest": "94s",
+   "win_rate": 0.552,
+   "ci95": [
+    0.5301,
+    0.5737
+   ],
+   "pairings": {
+    "win": 184,
+    "draw": 736,
+    "loss": 80
+   },
+   "avg_hands": 1.9,
+   "matches": 2000
+  },
+  {
+   "range": "top 85%",
+   "weakest": "84o",
+   "win_rate": 0.528,
+   "ci95": [
+    0.5061,
+    0.5498
+   ],
+   "pairings": {
+    "win": 96,
+    "draw": 864,
+    "loss": 40
+   },
+   "avg_hands": 1.4,
+   "matches": 2000
+  },
+  {
+   "range": "top 100%",
+   "weakest": "32o",
+   "win_rate": 0.5,
+   "ci95": [
+    0.4781,
+    0.5219
+   ],
+   "pairings": {
+    "win": 0,
+    "draw": 1000,
+    "loss": 0
+   },
+   "avg_hands": 1.0,
+   "matches": 2000
+  },
+  {
+   "range": "v1",
+   "weakest": null,
+   "win_rate": 0.652,
+   "ci95": [
+    0.6309,
+    0.6726
+   ],
+   "pairings": {
+    "win": 409,
+    "draw": 486,
+    "loss": 105
+   },
+   "avg_hands": 11.5,
+   "matches": 2000
+  }
+ ]
+}

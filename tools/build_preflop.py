@@ -5,7 +5,7 @@ Step 1  sample random heads-up all-in deals and record, for every pair of
 Step 2  from that matrix, solve the all-in-or-fold game for short stacks
         (fictitious play, the standard way to find the Nash ranges).
 
-Writes my_bots/v1/data/preflop.json.
+Writes my_bots/im_just_in_mech_eng/data/preflop.json.
 
   python tools/build_preflop.py --samples 60000000 --workers 8
 """
@@ -118,7 +118,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--samples", type=int, default=40_000_000)
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
-    ap.add_argument("--out", default=os.path.join("my_bots", "v1", "data", "preflop.json"))
+    ap.add_argument("--out", default=os.path.join("my_bots", "im_just_in_mech_eng", "data", "preflop.json"))
     args = ap.parse_args()
 
     t0 = time.time()

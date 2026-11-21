@@ -5,9 +5,9 @@ Each PAIR is two freezeout matches on the same seed (the same cards), with the
 seats swapped. Win both = pairing win, one each = draw. It uses the organisers'
 own table and engine code (pokercore), untouched.
 
-  python arena.py my_bots/v1 bots/caller --pairs 200
-  python arena.py my_bots/v1 sparring/allin --pairs 200 --workers 6
-  python arena.py my_bots/v1 bots/caller --pairs 20 --real     # real sandboxed bot processes
+  python arena.py my_bots/im_just_in_mech_eng bots/caller --pairs 200
+  python arena.py my_bots/im_just_in_mech_eng sparring/allin --pairs 200 --workers 6
+  python arena.py my_bots/im_just_in_mech_eng bots/caller --pairs 20 --real     # real sandboxed bot processes
 
 Default mode calls each bot's decide() directly in this process (fast). --real
 starts the bots exactly as play.py does (slower, but the tournament's own path).
@@ -149,7 +149,7 @@ class Audit:
 
     def _bot(self, name):
         return self.per_bot.setdefault(name, {"decisions": 0, "errors": 0, "corrected": 0,
-                                              "free_folds": 0, "max_ms": 0.0, "sum_ms": 0.0})
+                                              "free_folds": 0, "data_bad": 0, "max_ms": 0.0, "sum_ms": 0.0})
 
     def emit(self, event_type, **data):
         event = {"i": self.n, "type": event_type, **data}
@@ -163,6 +163,9 @@ class Audit:
             b["max_ms"] = max(b["max_ms"], ms)
             b["sum_ms"] += ms
             reply, applied, state = data["reply"], data["applied"], data["state"]
+            dbg = data.get("debug")
+            if isinstance(dbg, dict) and dbg.get("data_ok") is False:
+                b["data_bad"] += 1
             asked = str(reply.get("action") or "").lower().strip()
             problem = None
             if data.get("error"):
@@ -220,6 +223,7 @@ def play_one(bot_a, bot_b, seed, first, real, log_path=None):
         "a_won": winner == names[0], "hands": result["hands"], "stopped": result["stopped"],
         "decisions": a.get("decisions", 0), "errors": a.get("errors", 0),
         "corrected": a.get("corrected", 0), "free_folds": a.get("free_folds", 0),
+        "data_bad": a.get("data_bad", 0),
         "max_ms": a.get("max_ms", 0.0), "sum_ms": a.get("sum_ms", 0.0),
         "timeouts": a_res.get("timeouts") or 0, "restarts": a_res.get("restarts") or 0,
         "examples": [e for e in audit.examples if e["bot"] == names[0]],
@@ -229,9 +233,15 @@ def play_one(bot_a, bot_b, seed, first, real, log_path=None):
 def play_pair(args):
     bot_a, bot_b, seed, real = args
     try:
-        return seed, [play_one(bot_a, bot_b, seed, 0, real), play_one(bot_a, bot_b, seed, 1, real)]
+        return bot_b, seed, [play_one(bot_a, bot_b, seed, 0, real), play_one(bot_a, bot_b, seed, 1, real)]
     except Exception:
-        return seed, {"crash": traceback.format_exc()[-1500:]}
+        return bot_b, seed, {"crash": traceback.format_exc()[-1500:]}
+
+
+def pair_seeds(base, pairs):
+    """Pair k always gets the same seed for a given base, whatever the bot or
+    version, so versions are compared on the same cards."""
+    return [derive_seed(base, "pair", k) % (2 ** 31) for k in range(pairs)]
 
 
 def wilson(wins, n, z=1.96):
@@ -244,78 +254,104 @@ def wilson(wins, n, z=1.96):
     return centre - half, centre + half
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("bot_a")
-    ap.add_argument("bot_b")
-    ap.add_argument("--pairs", type=int, default=200)
-    ap.add_argument("--seed", type=int, default=1, help="base seed; pair k uses a seed derived from it")
-    ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 2))
-    ap.add_argument("--real", action="store_true", help="sandboxed bot processes, as play.py runs them")
-    ap.add_argument("--json", metavar="FILE", help="also write the summary as JSON")
-    args = ap.parse_args()
-
-    seeds = [derive_seed(args.seed, "pair", k) % (2 ** 31) for k in range(args.pairs)]
-    jobs = [(args.bot_a, args.bot_b, s, args.real) for s in seeds]
-    t0 = time.time()
-    matches, pair_w, pair_d, pair_l, runner_crashes = [], 0, 0, 0, []
-    with mp.Pool(args.workers) as pool:
-        for seed, res in pool.imap_unordered(play_pair, jobs):
-            if isinstance(res, dict):
-                runner_crashes.append((seed, res["crash"]))
-                continue
-            matches += res
-            won = sum(1 for m in res if m["a_won"])
-            pair_w += won == 2
-            pair_d += won == 1
-            pair_l += won == 0
-
+def summarise(bot_a, bot_b, pair_results, mode, seconds=None):
+    """pair_results: the third item of each play_pair() return for this matchup."""
+    matches, pw, pd, pl, crashes = [], 0, 0, 0, []
+    for res in pair_results:
+        if isinstance(res, dict):
+            crashes.append(res["crash"])
+            continue
+        matches += res
+        won = sum(1 for m in res if m["a_won"])
+        pw += won == 2
+        pd += won == 1
+        pl += won == 0
     n = len(matches)
     wins = sum(1 for m in matches if m["a_won"])
     lo, hi = wilson(wins, n)
-    pairs = pair_w + pair_d + pair_l
+    pairs = pw + pd + pl
     decisions = sum(m["decisions"] for m in matches)
-    summary = {
-        "bot": args.bot_a, "opponent": args.bot_b, "mode": "real" if args.real else "in-process",
+    return {
+        "bot": bot_a, "opponent": bot_b, "name": _bot_name(bot_b), "mode": mode,
         "pairs": pairs, "matches": n, "match_wins": wins,
         "match_win_rate": round(wins / n, 4) if n else None,
         "ci95": [round(lo, 4), round(hi, 4)],
-        "pairings": {"win": pair_w, "draw": pair_d, "loss": pair_l},
-        "points_per_pairing": round((pair_w + 0.5 * pair_d) / pairs, 4) if pairs else None,
+        "pairings": {"win": pw, "draw": pd, "loss": pl},
+        "points_per_pairing": round((pw + 0.5 * pd) / pairs, 4) if pairs else None,
         "decisions": decisions,
         "crashes": sum(m["errors"] for m in matches),
         "timeouts": sum(m["timeouts"] for m in matches),
         "restarts": sum(m["restarts"] for m in matches),
         "corrected_actions": sum(m["corrected"] for m in matches),
         "free_folds": sum(m["free_folds"] for m in matches),
+        "data_bad": sum(m["data_bad"] for m in matches),
         "slowest_ms": round(max((m["max_ms"] for m in matches), default=0.0), 1),
         "avg_ms": round(sum(m["sum_ms"] for m in matches) / decisions, 2) if decisions else 0.0,
         "avg_hands": round(sum(m["hands"] for m in matches) / n, 1) if n else 0,
         "hand_limit_matches": sum(1 for m in matches if m["stopped"] != "one_player_left"),
-        "runner_crashes": len(runner_crashes),
-        "seconds": round(time.time() - t0, 1),
+        "runner_crashes": len(crashes), "runner_crash_text": crashes[:2],
+        "examples": [e for m in matches for e in m["examples"]][:5],
+        "seconds": seconds,
     }
-    print(f"\n{_bot_name(args.bot_a)} vs {_bot_name(args.bot_b)}  "
-          f"({summary['mode']}, {pairs} duplicate pairs, {n} matches, {summary['seconds']}s)")
+
+
+def fail_loudly(summaries):
+    """Stop with a non-zero exit if the bot ever played without its tables, or
+    if the runner itself broke. A silent fallback would make every number a lie."""
+    bad = [s for s in summaries if s["data_bad"] or s["runner_crashes"]]
+    if not bad:
+        return
+    print("\n" + "!" * 78)
+    for s in bad:
+        if s["data_bad"]:
+            print(f"FATAL: data_ok was False on {s['data_bad']} decisions vs {s['name']}: "
+                  "the bot's data tables did not load. Results are NOT valid.")
+        if s["runner_crashes"]:
+            print(f"FATAL: the runner crashed on {s['runner_crashes']} pairs vs {s['name']}:")
+            for tb in s["runner_crash_text"]:
+                print(tb)
+    print("!" * 78)
+    sys.exit(2)
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("bot_a")
+    ap.add_argument("bot_b")
+    ap.add_argument("--pairs", type=int, default=200)
+    ap.add_argument("--seed", type=int, default=1, help="base seed; pair k uses a seed derived from it")
+    ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
+    ap.add_argument("--real", action="store_true", help="sandboxed bot processes, as play.py runs them")
+    ap.add_argument("--json", metavar="FILE", help="also write the summary as JSON")
+    args = ap.parse_args()
+
+    jobs = [(args.bot_a, args.bot_b, s, args.real) for s in pair_seeds(args.seed, args.pairs)]
+    t0 = time.time()
+    with mp.Pool(args.workers) as pool:
+        results = [res for _, _, res in pool.imap_unordered(play_pair, jobs)]
+    s = summarise(args.bot_a, args.bot_b, results, "real" if args.real else "in-process",
+                  round(time.time() - t0, 1))
+
+    n, wins = s["matches"], s["match_wins"]
+    p = s["pairings"]
+    print(f"\n{_bot_name(args.bot_a)} vs {s['name']}  "
+          f"({s['mode']}, {s['pairs']} duplicate pairs, {n} matches, {s['seconds']}s)")
     print(f"  match win rate      {wins}/{n} = {100 * wins / max(n, 1):.1f}%   "
-          f"(95% CI {100 * lo:.1f}-{100 * hi:.1f}%)")
-    print(f"  pairings W/D/L      {pair_w}/{pair_d}/{pair_l}   "
-          f"points per pairing {summary['points_per_pairing']}")
-    print(f"  crashes             {summary['crashes']}   timeouts {summary['timeouts']}   "
-          f"restarts {summary['restarts']}")
-    print(f"  corrected actions   {summary['corrected_actions']}   (folds when a check was free: "
-          f"{summary['free_folds']})")
-    print(f"  slowest decision    {summary['slowest_ms']} ms   (average {summary['avg_ms']} ms over "
-          f"{decisions:,} decisions)")
-    print(f"  average match       {summary['avg_hands']} hands")
-    examples = [e for m in matches for e in m["examples"]][:5]
-    for e in examples:
+          f"(95% CI {100 * s['ci95'][0]:.1f}-{100 * s['ci95'][1]:.1f}%)")
+    print(f"  pairings W/D/L      {p['win']}/{p['draw']}/{p['loss']}   "
+          f"points per pairing {s['points_per_pairing']}")
+    print(f"  crashes             {s['crashes']}   timeouts {s['timeouts']}   restarts {s['restarts']}")
+    print(f"  corrected actions   {s['corrected_actions']}   (folds when a check was free: "
+          f"{s['free_folds']})")
+    print(f"  slowest decision    {s['slowest_ms']} ms   (average {s['avg_ms']} ms over "
+          f"{s['decisions']:,} decisions)")
+    print(f"  average match       {s['avg_hands']} hands")
+    for e in s["examples"]:
         print("  example problem:", e)
-    for seed, tb in runner_crashes[:2]:
-        print(f"  RUNNER CRASH on seed {seed}:\n{tb}")
     if args.json:
         with open(args.json, "w") as f:
-            json.dump(summary, f, indent=2)
+            json.dump(s, f, indent=2)
+    fail_loudly([s])
     return 0
 
 

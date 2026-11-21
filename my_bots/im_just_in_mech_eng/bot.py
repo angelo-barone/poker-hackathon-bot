@@ -1,5 +1,5 @@
 """
-v1: heads-up No-Limit Hold'em tournament bot.
+Team im_just_in_mech_eng (bot version v1): heads-up No-Limit Hold'em tournament bot.
 
 How it works, in plain words:
 
@@ -558,6 +558,7 @@ def _think(s, t0):
         act, dbg = _preflop(s, c)
     else:
         act, dbg = _postflop(s, c, t0 + THINK_S)
+    dbg["data_ok"] = DATA_OK                          # False = the tables failed to load
     dbg["ms"] = round((time.perf_counter() - t0) * 1000, 1)
     act["debug"] = dbg
     return act
