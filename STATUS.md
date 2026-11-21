@@ -6,7 +6,15 @@ same seeds and no other matchup in the full field drops by more than noise.
 **Scoring confirmed by the organisers (12:00):** a pairing is worth 2 for a win, 1 for a draw, 0 for a loss.
 Our "points per pairing" (1 / 0.5 / 0) is the same metric at half scale, and stays the deciding number.
 
-## 17:48 — Last test round (coach, 17:38): hybrids and frozen versions. Test only, entry unchanged
+## 17:49 — FINAL STATE after the last test round
+
+- 17:46 commit `59352a3` pushed to main: the eight hybrid sparring bots, frozen v3 and v4, the results of this round, and this STATUS.md (copied into the repo as `STATUS.md`). Working tree clean, 0 uncommitted files, 0 unpushed commits.
+- The entry has 0 differences from the tag `safe-v5a`. No code in `my_bots/` was touched in this round. No further code commits are planned; only STATUS.md may still be updated.
+
+**Final state in one paragraph**
+The submitted bot is v5a in `my_bots/im_just_in_mech_eng`, public on GitHub at commit `59352a3` and marked by the tag `safe-v5a`. It is the last version that passed a same-seed verdict: v4's strategy (reading bets by how often an opponent makes them, bet sizes set by the situation, small stabs, all-in-or-fold from 15 big blinds, caution with early all-ins) plus two bug fixes from an independent audit. It scores 0.803 points per pairing against 35 sparring bots, wins 88% and 96% of matches against two real bots from the London event, 74% against an attacker written from its own audit, and at least 62% against each of eight further hybrid styles tested in the last round. Across more than 14 million test decisions and 36 Docker sandbox matches it has never crashed, timed out, sent an action the engine had to correct, or lost its data tables, and its slowest decision on half a CPU core was 48 ms against a 2,000 ms limit. A second independent safety audit found no bug the tournament can reach. Six later candidates (v5b, v5d, v5c, Fix Y, Fix X, v5e) were tested and rejected. Its weakest known matchups are bots that play like itself (a coin flip), mc_exploiter (about 51%), jam20, gto_charts and stack_bully (about 60 to 62%), and the all-in bot (about 66%).
+
+## 17:46 — Last test round (coach, 17:38): hybrids and frozen versions. Test only, entry unchanged
 
 - 17:42 eight hybrid sparring bots built with `tools/make_sparring.py` and validated: limp_trapper, delayed, min_better, checkraiser, phase_shifter, rare_overbet_bluffer, stack_bully, math_maniac. phase_shifter is close to the existing switcher but switches at hand 40 instead of 15, so it was kept. Frozen copies `sparring/v3_frozen` and `sparring/v4_frozen` added next to `v2_frozen`.
 - 17:42 to 17:45 entry (v5a) against all eleven, 100 duplicate pairs each (156 s).
