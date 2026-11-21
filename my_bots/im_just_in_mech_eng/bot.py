@@ -1,5 +1,5 @@
 """
-Team im_just_in_mech_eng (bot version v2): heads-up No-Limit Hold'em tournament bot.
+Team im_just_in_mech_eng (bot version v3): heads-up No-Limit Hold'em tournament bot.
 
 How it works, in plain words:
 
@@ -27,6 +27,13 @@ How it works, in plain words:
      fold when it is too expensive, call when it is fair, bet or raise when we
      are well ahead. Putting a deep stack in needs a stronger hand than the
      price alone asks for.
+  7. NOT BEING READABLE (_bet_plan). Our bet size comes from the situation
+     (street, board texture, stack depth), never from how strong our hand is,
+     and bluffs use the same sizes as value bets. When the opponent checks we
+     often take a small stab at the pot; we sometimes check a strong hand to a
+     player who bets whenever checked to; and we sometimes raise as a bluff
+     against a player who bets almost every time. All three rates follow the
+     counters: more against players who fold, none against players who call.
 
 Only eval7.Card and eval7.evaluate are used from eval7.
 """
@@ -181,6 +188,11 @@ STATS = {
     # bets that reached a showdown: how often was the hand behind them weak?
     "shown_flop_n": 0, "shown_flop_weak": 0, "shown_late_n": 0, "shown_late_weak": 0,
     "shown_big_n": 0, "shown_big_weak": 0,
+    # how they answer our own bets, by what we did
+    "sbet_n": 0, "sbet_fold": 0,                            # our small bets (up to 0.45 pot)
+    "nbet_n": 0, "nbet_fold": 0,                            # our normal and big bets
+    "rr_n": 0, "rr_fold": 0,                                # our raises over their bets
+    "any_n": 0, "any_fold": 0,                              # any street: chips to call, did they fold?
 }
 _DONE_HANDS = set()
 _BOARDS = {}                     # hand number -> the board as we last saw it
@@ -199,13 +211,14 @@ def _replay(entries, me):
     bets = {}
     street = "preflop"
     out = []
+    last = None                                           # (who, size, was it a raise) this street
     for e in entries:
         act = e.get("action")
         st = e.get("street")
         if act == "show" or act is None:
             continue
         if st != street and st in ("flop", "turn", "river"):
-            street, bets = st, {}
+            street, bets, last = st, {}, None
         who = e.get("bot_id")
         amount = int(e.get("amount") or 0)
         mine = bets.get(who, 0)
@@ -221,7 +234,9 @@ def _replay(entries, me):
         top = max(bets.values()) if bets else 0
         to_call = max(0, top - mine)
         rec = {"street": street, "facing": to_call > 0, "kind": "none", "big": False,
-               "size": 0.0, "action": act}
+               "size": 0.0, "action": act,
+               "faced_size": last[1] if last and last[0] == me else 0.0,
+               "faced_raise": bool(last and last[0] == me and last[2])}
         if act == "call":
             bets[who] = mine + amount
             pot += amount
@@ -231,6 +246,7 @@ def _replay(entries, me):
                 rec["kind"] = "raise" if to_call > 0 else "bet"
                 rec["size"] = size
                 rec["big"] = size > BIG_BET or (act == "all_in" and size > 0.75)
+                last = (who, size, to_call > 0)
             pot += max(0, amount - mine)
             bets[who] = max(mine, amount)
         if who != me and street != "preflop":
@@ -267,6 +283,9 @@ def _digest(entries, me, hand_num=None):
         if e.get("bot_id") != me:
             s["agg_n"] += 1
             s["agg"] += e["action"] in ("raise", "all_in")
+            if e["action"] != "check":                      # preflop, anything but a check faced a bet
+                s["any_n"] += 1
+                s["any_fold"] += e["action"] == "fold"
     if pre:
         first = pre[0]
         if sb_id != me and first.get("bot_id") != me:
@@ -312,8 +331,13 @@ def _digest(entries, me, hand_num=None):
         if rec["facing"]:
             s["rz_n"] += 1
             s["bet_faced_n"] += 1
-            if rec["action"] == "fold":
-                s["bet_fold"] += 1
+            folded = rec["action"] == "fold"
+            s["bet_fold"] += folded
+            s["any_n"] += 1
+            s["any_fold"] += folded
+            key = "rr" if rec["faced_raise"] else ("sbet" if rec["faced_size"] <= 0.45 else "nbet")
+            s[key + "_n"] += 1
+            s[key + "_fold"] += folded
             if rec["kind"] == "raise" and not rec["big"]:
                 s["rz"] += 1
         else:
@@ -660,6 +684,95 @@ def _commit_premium(c, risk):
             * min(1.0, (risk / float(before)) / 1.5))
 
 
+def _wet(board):
+    """A flop where draws are likely: two cards of one suit, or three close in rank."""
+    flop = board[:3]
+    ranks = sorted(RANKS.index(card[0]) for card in flop)
+    if len(set(ranks)) < 3:
+        return False                                      # paired boards are dry
+    return len(set(card[1] for card in flop)) < 3 or ranks[2] - ranks[0] <= 4
+
+
+def _their_bet_rate(street):
+    """How often this opponent bets when nobody has bet yet on this street."""
+    st = STATS
+    if street == "flop":
+        return _rate(st["fbet"], st["fbet_n"], 0.50, 6)
+    return _rate(st["lbet"], st["lbet_n"], 0.40, 6)
+
+
+def _bet_plan(s, c, eq, was_aggressor, deep, dbg):
+    """Nothing to call: bet or check?
+
+    The SIZE depends only on the situation, so it says nothing about our hand:
+    about a third of the pot when a flop is checked to us, half when we act
+    first on a flop, more on boards with draws, two thirds on the turn, three
+    quarters on the river, and bigger against a player who rarely folds.
+    Strong hands bet for value; weaker hands sometimes bet the same size as a
+    stab, more often against players who fold to that size and never when
+    their folding does not pay for the bet."""
+    st = STATS
+    me, street = c["me"], s["street"]
+    pot, stack = c["pot"], c["stack"]
+    acts = [a for a in s["action_log"] if a.get("action") in VOLUNTARY]
+    checked_to = any(a.get("street") == street and a.get("bot_id") != me and a["action"] == "check"
+                     for a in acts)
+    earlier = {"turn": "flop", "river": "turn"}.get(street)
+    barrel = any(a.get("street") == earlier and a.get("bot_id") == me and a["action"] in ("raise", "all_in")
+                 for a in acts)
+
+    if street == "flop":
+        frac = 0.33 if checked_to else 0.50
+        if _wet(s["community_cards"]):
+            frac += 0.13
+    elif street == "turn":
+        frac = 0.66
+    else:
+        frac = 0.75
+    # Starting guess for their folding after the flop: how often they fold at
+    # all, preflop included. Someone who never folds preflop rarely folds later.
+    fold_guess = _rate(st["any_fold"], st["any_n"], 0.40, 6)
+    fold_all = _rate(st["bet_fold"], st["bet_faced_n"], fold_guess, 4)
+    if frac <= 0.45:
+        fold_here = _rate(st["sbet_fold"], st["sbet_n"], fold_guess, 4)
+    else:
+        fold_here = _rate(st["nbet_fold"], st["nbet_n"], fold_guess, 4)
+    dbg["ftb"] = round(fold_here, 2)
+
+    # Against a player who rarely folds, every bet of ours is bigger (value and
+    # stab alike, so the size still says nothing about the hand).
+    frac *= 1.0 + 0.6 * min(1.0, max(0.0, (0.45 - fold_all) / 0.25))
+    value_at = 0.54 + 0.12 * fold_all                 # callers get value-bet thinner
+    if eq >= value_at:
+        # Sometimes check a strong hand when we act first, so a check from us is
+        # not always weakness; more often against players who bet when checked to.
+        if not checked_to:
+            their_bet = _their_bet_rate(street)
+            trap = 0.6 * (their_bet - 0.5) + (0.10 if street != "river" else 0.0)
+            if random.random() < min(0.45, max(0.0, trap)):
+                dbg["trap"] = 1
+                return {"action": "check"}
+        bet = int(frac * pot)
+        if bet >= 0.6 * stack and (not deep or eq >= value_at + 2 * _commit_premium(c, stack)):
+            return {"action": "all_in"}
+        return {"action": "raise", "amount": s["current_bet"] + bet}
+
+    # No value hand: a stab at the same size, at a rate that follows their folding.
+    bet = int(frac * pot)
+    pays = frac / (1.0 + frac) - 0.05                 # folds needed for a bluff this size to pay
+    if fold_here >= max(0.15, pays) and bet < 0.6 * stack and not (street == "river" and eq >= 0.35):
+        if checked_to:
+            base = {"flop": 0.50, "turn": 0.45, "river": 0.30}[street]
+        elif street == "flop":
+            base = 0.50 if was_aggressor else 0.20
+        else:
+            base = 0.30 if barrel else 0.15
+        if random.random() < min(0.85, base * min(1.8, fold_here / 0.40)):
+            dbg["bluff"] = 1
+            return {"action": "raise", "amount": s["current_bet"] + bet}
+    return {"action": "check"}
+
+
 def _postflop(s, c, deadline):
     st = STATS
     pot, owed, stack = c["pot"], c["owed"], c["stack"]
@@ -676,24 +789,7 @@ def _postflop(s, c, deadline):
     if owed == 0:
         if c["opp_all_in"]:
             return {"action": "check"}, dbg
-        value_at = 0.54 + 0.12 * fold_to_bet          # callers get value-bet thinner
-        if eq >= value_at:
-            frac = min(1.0, max(0.5, 0.55 + 1.5 * (eq - value_at)))
-            if fold_to_bet < 0.20:
-                frac += 0.25
-            bet = int(frac * pot)
-            if bet >= 0.6 * stack and (not deep or eq >= value_at + 2 * _commit_premium(c, stack)):
-                return {"action": "all_in"}, dbg
-            return {"action": "raise", "amount": s["current_bet"] + bet}, dbg
-        # Bluffs only where the counters say they fold often enough to pay for it.
-        r = random.random()
-        if street == "flop" and was_aggressor and fold_to_bet >= 0.33 and r < 0.5:
-            dbg["bluff"] = 1
-            return {"action": "raise", "amount": s["current_bet"] + int(0.5 * pot)}, dbg
-        if street != "flop" and fold_to_bet > 0.50 and eq < 0.40 and r < 0.4:
-            dbg["bluff"] = 1
-            return {"action": "raise", "amount": s["current_bet"] + int(0.6 * pot)}, dbg
-        return {"action": "check"}, dbg
+        return _bet_plan(s, c, eq, was_aggressor, deep, dbg), dbg
 
     odds = owed / float(pot + owed)
     premium = _commit_premium(c, min(owed, stack))
@@ -710,6 +806,19 @@ def _postflop(s, c, deadline):
             return {"action": "call"}, dbg
         return {"action": "raise", "amount": raise_to}, dbg
     margin = 0.0 if street == "river" else 0.02
+    # Against a player who bets almost every time nobody has bet, most of those
+    # bets are weak: sometimes raise as a bluff, at the same size as a value
+    # raise, as long as they have not shown that they never fold to raises.
+    size_now = owed / float(max(1, pot - owed))
+    if (street != "river" and c["my_bet"] == 0 and size_now <= BIG_BET
+            and eq < odds + margin + premium + 0.15 and _their_bet_rate(street) >= 0.70):
+        fold_guess = _rate(st["any_fold"], st["any_n"], 0.40, 6)
+        fold_to_raise = _rate(st["rr_fold"], st["rr_n"], min(0.60, fold_guess + 0.05), 3)
+        raise_to = s["current_bet"] + int(0.75 * (pot + owed))
+        if (fold_to_raise >= 0.25 and raise_to - c["my_bet"] < 0.4 * stack
+                and random.random() < min(0.45, 0.20 * fold_to_raise / 0.45)):
+            dbg["bluff"] = 2
+            return {"action": "raise", "amount": raise_to}, dbg
     if eq >= odds + margin + premium:
         return {"action": "call"}, dbg
     return {"action": "fold"}, dbg

@@ -42,3 +42,25 @@ Reliability: 0 crashes, 0 timeouts, 0 corrected actions over 1,135,101 decisions
 Promoted by Angelo's decision: it did not pass the "target matchups must go up" test (threebettor +1.2,
 stealer +0.6, maniac 0.0, gto_charts +3.8, all inside noise), but it scored higher overall and held up
 on the robustness check.
+
+## v3 promoted to the entry (Nov 21, 13:37)
+
+What changed: how the bot bets. The bet size now comes from the situation (street, board texture,
+who acted first, how often this opponent folds), never from how strong our hand is, and bluffs use the
+same sizes as value bets. When the opponent checks, the bot often takes a small stab at the pot. It
+sometimes checks a strong hand to a player who bets whenever checked to, and sometimes raises as a bluff
+against a player who bets almost every time. Every rate follows the counters.
+
+| Test (250 pairs, same seeds) | v2 | v3 |
+|---|---|---|
+| Full field, 33 opponents: points per pairing | 0.746 | 0.797 |
+| mc_exploiter | 41.4% | 48.8% |
+| classifier | 58.4% | 71.8% |
+| donkbettor | 51.0% | 73.8% |
+| v3 against v2 head to head | - | 57.4% |
+| caller / trapper / chartbot / nit / smallbet_trap | 96.6 / 91.0 / 59.4 / 99.6 / 83.2 | 96.4 / 93.8 / 74.4 / 99.4 / 94.8 |
+
+Nine matchups rose beyond noise, none fell beyond noise (largest drop: random -4.6, noise 5.2).
+Reliability: 0 crashes, 0 timeouts, 0 corrected actions over 1,713,390 decisions. Slowest 80 ms.
+Passed the standing rule. A first try with smaller bets scored 0.779 and lost 7 points to random and
+6.4 to lateshover; bigger sizes against players who rarely fold fixed that.
