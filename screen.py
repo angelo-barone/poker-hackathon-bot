@@ -64,6 +64,24 @@ def show(title, rows, seconds):
           f"{sum(r['crashes'] + r['timeouts'] for r in rows)} crashes/timeouts, "
           f"{sum(r['corrected_actions'] for r in rows)} corrected actions, "
           f"slowest {max(r['slowest_ms'] for r in rows)} ms")
+    pts = sum(r["pairings"]["win"] + 0.5 * r["pairings"]["draw"] for r in rows)
+    print(f"  points per pairing: {pts / max(1, sum(r['pairs'] for r in rows)):.4f}")
+    d = {}
+    for r in rows:
+        for k, v in r["depth"].items():
+            if isinstance(v, list):
+                cur = d.setdefault(k, [0, 0])
+                cur[0] += v[0]
+                cur[1] += v[1]
+            else:
+                d[k] = d.get(k, 0) + v
+    hands = max(1, d["short_hands"] + d["zone_hands"] + d["deep_hands"])
+    pct = lambda wn: f"{100 * wn[0] / wn[1]:.1f}% of {wn[1]}" if wn[1] else "none"
+    print(f"  hands by effective stack: under 15 bb {100 * d['short_hands'] / hands:.1f}%, "
+          f"15-40 bb {100 * d['zone_hands'] / hands:.1f}%, over 40 bb {100 * d['deep_hands'] / hands:.1f}%")
+    print(f"  matches that reach 15-40 bb: we win {pct(d['reached'])}  "
+          f"(entered ahead {pct(d['entered_ahead'])}, even {pct(d['entered_even'])}, "
+          f"behind {pct(d['entered_behind'])}); matches that never do: {pct(d['never_reached'])}")
 
 
 def main():

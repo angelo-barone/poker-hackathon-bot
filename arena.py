@@ -183,6 +183,9 @@ class Audit:
         self.per_bot = {}
         self.examples = []
         self.hand = None                            # the hand being played, for the luck-adjusted score
+        # hands by effective stack (the shorter stack, in big blinds) at the start of the hand
+        self.depth = {"short": 0, "zone": 0, "deep": 0}
+        self.zone_first = None                      # both stacks at the first hand in the 15-40 bb zone
 
     def _bot(self, name):
         return self.per_bot.setdefault(name, {"decisions": 0, "errors": 0, "corrected": 0,
@@ -200,6 +203,15 @@ class Audit:
         if event_type == "hand_start":
             self.hand = {"hole": data["hole"], "stacks": data["stacks"], "bb": data["blinds"]["bb"],
                          "board": [], "board_at_last_decision": [], "showdown": False}
+            eff = min(data["stacks"].values()) / float(data["blinds"]["bb"])
+            if eff < 15:
+                self.depth["short"] += 1
+            elif eff <= 40:
+                self.depth["zone"] += 1
+                if self.zone_first is None:
+                    self.zone_first = dict(data["stacks"])
+            else:
+                self.depth["deep"] += 1
         elif event_type == "deal":
             self.hand["board"] = list(data["board"])
         elif event_type == "showdown":
@@ -300,6 +312,10 @@ def play_one(bot_a, bot_b, seed, first, real, log_path=None, keep=False):
         "data_bad": a.get("data_bad", 0),
         "chips": a.get("chips", 0), "adj_chips": a.get("adj_chips", 0.0), "adj_bb": a.get("adj_bb", 0.0),
         "allins_adjusted": a.get("allins_adjusted", 0),
+        "short_hands": audit.depth["short"], "zone_hands": audit.depth["zone"],
+        "deep_hands": audit.depth["deep"],
+        "zone_first_share": (audit.zone_first[names[0]] / float(sum(audit.zone_first.values()))
+                             if audit.zone_first else None),
         "max_ms": a.get("max_ms", 0.0), "sum_ms": a.get("sum_ms", 0.0),
         "timeouts": a_res.get("timeouts") or 0, "restarts": a_res.get("restarts") or 0,
         "examples": [e for e in audit.examples if e["bot"] == names[0]],
@@ -328,6 +344,24 @@ def wilson(wins, n, z=1.96):
     centre = (p + z * z / (2 * n)) / d
     half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
     return centre - half, centre + half
+
+
+def depth_summary(matches):
+    """How much of the play happens at an effective stack of 15-40 big blinds,
+    and how we do in the matches that get there."""
+    def rate(ms):
+        return [sum(1 for m in ms if m["a_won"]), len(ms)]
+    reach = [m for m in matches if m["zone_hands"] > 0]
+    return {
+        "short_hands": sum(m["short_hands"] for m in matches),
+        "zone_hands": sum(m["zone_hands"] for m in matches),
+        "deep_hands": sum(m["deep_hands"] for m in matches),
+        "reached": rate(reach),                                              # [wins, matches]
+        "never_reached": rate([m for m in matches if m["zone_hands"] == 0]),
+        "entered_ahead": rate([m for m in reach if m["zone_first_share"] > 0.5]),
+        "entered_even": rate([m for m in reach if m["zone_first_share"] == 0.5]),
+        "entered_behind": rate([m for m in reach if m["zone_first_share"] < 0.5]),
+    }
 
 
 def summarise(bot_a, bot_b, pair_results, mode, seconds=None):
@@ -368,6 +402,7 @@ def summarise(bot_a, bot_b, pair_results, mode, seconds=None):
         "adj_bb_per_100": round(100 * sum(m["adj_bb"] for m in matches)
                                 / max(1, sum(m["hands"] for m in matches)), 2),
         "allins_adjusted": sum(m["allins_adjusted"] for m in matches),
+        "depth": depth_summary(matches),
         "slowest_ms": round(max((m["max_ms"] for m in matches), default=0.0), 1),
         "avg_ms": round(sum(m["sum_ms"] for m in matches) / decisions, 2) if decisions else 0.0,
         "avg_hands": round(sum(m["hands"] for m in matches) / n, 1) if n else 0,
