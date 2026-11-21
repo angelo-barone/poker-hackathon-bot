@@ -1,0 +1,167 @@
+leak report: 250 pairs vs each of 4 opponents (106s)
+
+=== vs chartbot: 250 pairs, 500 matches, 46,125 hands, match win rate 60.0% ===
+  overall: +2168 chips/100 hands, +14.2 bb/100
+
+  PREFLOP PATH                   per 100   we fold   chips/100    bb/100
+  BB: we face a raise               22.8       42%       -3728     -19.5
+  SB: we open, they re-raise         1.8       92%        -751      -5.4
+  SB: we fold                       10.1         -       -1212      -5.2
+  SB: we shove, they call            0.4         -        -402      -0.9
+  BB: we face a shove                0.3       31%         -39      -0.1
+  SB: we limp                        0.2         -         -26      -0.0
+  BB: they limp                      0.0         -          -8      -0.0
+  blinds force an all-in             0.4         -          -3      -0.0
+  SB: we shove, they fold            4.1         -        1982       4.3
+  SB: we open, they call            14.4         -         410       8.2
+  BB: they fold                     26.6         -        2863      13.7
+  SB: we open, they fold            18.8         -        3082      19.0
+
+  AFTER THE FLOP                 per 100             chips/100    bb/100
+  we fold to a bet                  11.7                 -8727     -56.7
+  we call their bet, lose            0.8                 -3807     -26.4
+  they call our bet, lose            0.3                  -789      -3.5
+  checked down, lose                 0.4                  -131      -1.0
+  we call their bet, tie             0.1                     0       0.0
+  checked down, tie                  0.0                     0       0.0
+  they call our bet, tie             0.0                     0       0.0
+  checked down, win                  0.5                   203       1.3
+  they call our bet, win             0.2                   860       5.6
+  they fold to our bet              10.5                  5087      30.8
+  we call their bet, win             1.2                  5018      41.8
+  postflop bets we faced: 24.3 per 100 hands, we folded to 48%
+
+  ALL-IN SHOWDOWNS               per 100   we win  deserved   chips/100    bb/100
+  postflop                          1.00      50%         -         273       8.4
+  preflop                           0.91      40%       43%        -343       0.3
+
+--- when are matches decided: chartbot (500 matches) ---
+  match length (hands), quartiles: [61, 97, 123]
+  biggest hand of the match happens at hand (quartiles): [36, 69, 103]
+  blind level of the biggest hand (% of matches): {'1': 11.8, '2': 15.2, '3': 16.0, '4': 14.2, '5': 15.0, '6': 15.2, '7': 8.0, '8': 3.0, '9': 1.6}
+  the biggest hand was: {'postflop': 54.6, 'no all-in': 37.2, 'preflop': 8.2}  (% of matches)
+  the last hand was:    {'postflop': 42.6, 'preflop': 39.6, 'no all-in': 17.8}  (% of matches)
+  pairings W/D/L 87/126/37; of the draws: same deal was the biggest hand in both matches 15.1%, and it was a preflop all-in both times 0.0%; biggest hand a preflop all-in in both matches 0.8%
+
+=== vs threebettor: 250 pairs, 500 matches, 16,234 hands, match win rate 64.2% ===
+  overall: +8747 chips/100 hands, +147.1 bb/100
+
+  PREFLOP PATH                   per 100   we fold   chips/100    bb/100
+  SB: we fold                       10.1         -        -401      -5.1
+  blinds force an all-in             0.1         -          -1      -0.0
+  SB: we limp                        0.0         -           1       0.0
+  BB: we face a shove                0.0        0%           2       0.0
+  SB: we shove, they call            1.1         -          -0       0.2
+  SB: we open, they call             3.7         -        1077      17.7
+  BB: we face a raise               29.9        5%        2007      28.3
+  BB: they limp                     19.8         -        2027      33.8
+  SB: we open, they re-raise        35.3       38%        4034      72.2
+
+  AFTER THE FLOP                 per 100             chips/100    bb/100
+  we fold to a bet                  40.8                -23173    -292.4
+  we call their bet, lose            2.4                 -6245     -75.1
+  they call our bet, lose            1.8                 -4730     -63.3
+  we call their bet, tie             0.4                     0       0.0
+  they call our bet, tie             0.3                     0       0.0
+  they fold to our bet               9.9                  4748      60.5
+  we call their bet, win             6.2                 16576     208.1
+  they call our bet, win             5.5                 21671     317.3
+  postflop bets we faced: 85.1 per 100 hands, we folded to 48%
+
+  ALL-IN SHOWDOWNS               per 100   we win  deserved   chips/100    bb/100
+  postflop                          4.66      74%         -       14686     197.6
+  preflop                           1.51      55%       55%          91       0.8
+
+--- when are matches decided: threebettor (500 matches) ---
+  match length (hands), quartiles: [21, 31, 43]
+  biggest hand of the match happens at hand (quartiles): [12, 23, 33]
+  blind level of the biggest hand (% of matches): {'1': 42.4, '2': 42.4, '3': 11.6, '4': 3.0, '5': 0.6}
+  the biggest hand was: {'postflop': 64.8, 'no all-in': 34.8, 'preflop': 0.4}  (% of matches)
+  the last hand was:    {'postflop': 76.0, 'preflop': 22.8, 'no all-in': 1.2}  (% of matches)
+  pairings W/D/L 93/135/22; of the draws: same deal was the biggest hand in both matches 11.1%, and it was a preflop all-in both times 0.0%; biggest hand a preflop all-in in both matches 0.0%
+
+=== vs stealer: 250 pairs, 500 matches, 17,063 hands, match win rate 68.6% ===
+  overall: +10901 chips/100 hands, +169.9 bb/100
+
+  PREFLOP PATH                   per 100   we fold   chips/100    bb/100
+  SB: we fold                       10.3         -        -430      -5.1
+  SB: we limp                        0.0         -           2      -0.0
+  BB: we face a shove                0.1        0%          -1       0.0
+  blinds force an all-in             0.1         -           1       0.0
+  SB: we shove, they call            1.4         -         362       2.1
+  BB: we face a raise               49.5       16%        3984      50.0
+  SB: we open, they re-raise        38.6       16%        6983     122.9
+
+  AFTER THE FLOP                 per 100             chips/100    bb/100
+  we fold to a bet                  39.2                -24342    -296.4
+  we call their bet, lose            2.5                 -6075     -71.9
+  they call our bet, lose            1.6                 -4849     -60.2
+  we call their bet, tie             0.5                     0       0.0
+  they call our bet, tie             0.3                     0       0.0
+  they fold to our bet               9.8                  4885      57.2
+  we call their bet, win             6.7                 15408     190.9
+  they call our bet, win             5.5                 24787     346.9
+  postflop bets we faced: 90.9 per 100 hands, we folded to 43%
+
+  ALL-IN SHOWDOWNS               per 100   we win  deserved   chips/100    bb/100
+  postflop                          4.53      78%         -       15990     210.6
+  preflop                           1.58      59%       54%         325       2.0
+
+--- when are matches decided: stealer (500 matches) ---
+  match length (hands), quartiles: [22, 31, 44]
+  biggest hand of the match happens at hand (quartiles): [13, 24, 33]
+  blind level of the biggest hand (% of matches): {'1': 37.4, '2': 44.6, '3': 13.6, '4': 4.0, '5': 0.4}
+  the biggest hand was: {'postflop': 59.4, 'no all-in': 40.4, 'preflop': 0.2}  (% of matches)
+  the last hand was:    {'postflop': 71.8, 'preflop': 25.4, 'no all-in': 2.8}  (% of matches)
+  pairings W/D/L 107/129/14; of the draws: same deal was the biggest hand in both matches 7.8%, and it was a preflop all-in both times 0.0%; biggest hand a preflop all-in in both matches 0.0%
+
+=== vs gto_charts: 250 pairs, 500 matches, 30,433 hands, match win rate 53.0% ===
+  overall: +986 chips/100 hands, +16.8 bb/100
+
+  PREFLOP PATH                   per 100   we fold   chips/100    bb/100
+  BB: we face a raise               36.8       20%       -1025     -10.1
+  SB: we open, they re-raise         6.0       82%       -1038      -8.6
+  SB: we fold                       10.5         -        -812      -5.3
+  SB: we open, they shove            1.0       78%        -751      -3.0
+  BB: we face a shove                1.8       72%        -352      -1.2
+  SB: we shove, they call            0.7         -        -299      -0.6
+  blinds force an all-in             0.0         -           0       0.0
+  SB: we limp                        0.0         -           1       0.0
+  SB: we shove, they fold            0.9         -         326       1.0
+  BB: they fold                     11.4         -         946       5.8
+  SB: we open, they fold            13.4         -        1920      13.5
+  SB: we open, they call            17.5         -        2070      25.4
+
+  AFTER THE FLOP                 per 100             chips/100    bb/100
+  we fold to a bet                  16.3                 -8537     -73.0
+  we call their bet, lose            1.4                 -5934     -59.4
+  they call our bet, lose            1.3                 -2352     -19.3
+  checked down, lose                 2.6                  -722      -6.7
+  checked down, tie                  0.3                     0       0.0
+  we call their bet, tie             0.3                     0       0.0
+  they call our bet, tie             0.2                     0       0.0
+  checked down, win                  1.9                   587       5.0
+  we call their bet, win             1.5                  5240      55.1
+  they call our bet, win             1.5                  5640      57.5
+  they fold to our bet              18.1                  7441      61.6
+  postflop bets we faced: 28.2 per 100 hands, we folded to 58%
+
+  ALL-IN SHOWDOWNS               per 100   we win  deserved   chips/100    bb/100
+  postflop                          1.49      63%         -        2919      30.9
+  preflop                           1.54      46%       47%        -441      -1.7
+
+--- when are matches decided: gto_charts (500 matches) ---
+  match length (hands), quartiles: [32, 56, 85]
+  biggest hand of the match happens at hand (quartiles): [23, 42, 68]
+  blind level of the biggest hand (% of matches): {'1': 19.6, '2': 28.2, '3': 20.6, '4': 14.8, '5': 7.6, '6': 4.6, '7': 3.6, '8': 0.8, '9': 0.2}
+  the biggest hand was: {'postflop': 61.0, 'no all-in': 28.0, 'preflop': 11.0}  (% of matches)
+  the last hand was:    {'postflop': 47.0, 'preflop': 52.2, 'no all-in': 0.8}  (% of matches)
+  pairings W/D/L 50/165/35; of the draws: same deal was the biggest hand in both matches 35.2%, and it was a preflop all-in both times 0.6%; biggest hand a preflop all-in in both matches 2.4%
+
+--- when are matches decided: all of them together (2000 matches) ---
+  match length (hands), quartiles: [27, 43, 77]
+  biggest hand of the match happens at hand (quartiles): [18, 31, 58]
+  blind level of the biggest hand (% of matches): {'1': 27.8, '2': 32.6, '3': 15.4, '4': 9.0, '5': 5.9, '6': 5.0, '7': 2.9, '8': 0.9, '9': 0.5}
+  the biggest hand was: {'postflop': 60.0, 'no all-in': 35.1, 'preflop': 5.0}  (% of matches)
+  the last hand was:    {'postflop': 59.4, 'preflop': 35.0, 'no all-in': 5.7}  (% of matches)
+  pairings W/D/L 337/555/108; of the draws: same deal was the biggest hand in both matches 18.4%, and it was a preflop all-in both times 0.2%; biggest hand a preflop all-in in both matches 0.9%

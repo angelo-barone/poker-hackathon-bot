@@ -141,8 +141,9 @@ class LocalSeat(Seat):
 class Audit:
     """The match log: counts what the engine had to correct for each bot."""
 
-    def __init__(self, out=None):
+    def __init__(self, out=None, keep=False):
         self.out = open(out, "w") if out else None
+        self.events = [] if keep else None          # keep=True: hold every event for analysis
         self.n = 0
         self.per_bot = {}
         self.examples = []
@@ -154,6 +155,8 @@ class Audit:
     def emit(self, event_type, **data):
         event = {"i": self.n, "type": event_type, **data}
         self.n += 1
+        if self.events is not None:
+            self.events.append(event)
         if self.out:
             self.out.write(json.dumps(event, default=str) + "\n")
         if event_type == "decision":
@@ -192,7 +195,7 @@ class Audit:
             self.out.close()
 
 
-def play_one(bot_a, bot_b, seed, first, real, log_path=None):
+def play_one(bot_a, bot_b, seed, first, real, log_path=None, keep=False):
     """One freezeout match. `first` (0/1) says which bot takes seat 0."""
     paths = [bot_a, bot_b]
     names = ["A:" + _bot_name(bot_a), "B:" + _bot_name(bot_b)]
@@ -207,7 +210,7 @@ def play_one(bot_a, bot_b, seed, first, real, log_path=None):
             seats.append(LocalSeat(names[k], paths[k], bot_seed))
     config = MatchConfig(mode="freezeout", hands=2000, starting_stack=10_000,
                          structure=structures.parse("standard", 10_000), seed=seed)
-    audit = Audit(log_path)
+    audit = Audit(log_path, keep)
     try:
         result = play_match(seats, config, "arena", audit)
     finally:
@@ -220,6 +223,7 @@ def play_one(bot_a, bot_b, seed, first, real, log_path=None):
     summ = {r["bot"]: r for r in result["results"]}
     a_res = summ.get(names[0], {})
     return {
+        "events": audit.events, "names": names,
         "a_won": winner == names[0], "hands": result["hands"], "stopped": result["stopped"],
         "decisions": a.get("decisions", 0), "errors": a.get("errors", 0),
         "corrected": a.get("corrected", 0), "free_folds": a.get("free_folds", 0),
