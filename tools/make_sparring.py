@@ -653,6 +653,164 @@ def decide(s):
     return normal_pre(s) if pre_flop else normal_post(s)
 ''')
 
+# ── weird hybrids: each mixes two styles on purpose ─────────────────────────
+DRAW = '''
+def has_draw(s):
+    """Four cards to a flush, or four ranks inside a five-rank span."""
+    cards = s["your_cards"] + s["community_cards"]
+    suits = [c[1] for c in cards]
+    if max(suits.count(x) for x in "shdc") >= 4:
+        return True
+    ranks = set(R.index(c[0]) for c in cards)
+    return any(len([r for r in ranks if lo <= r <= lo + 4]) >= 4 for lo in range(0, 9))
+'''
+
+BOTS["limp_trapper"] = ('Limps the small blind, re-raises big with top hands when raised, otherwise calls or folds.',
+                        NORMAL + '''
+
+def decide(s):
+    if s.get("type") == "warmup":
+        return {"action": "check"}
+    owed, bb = s["amount_owed"], s["blinds"]["bb"]
+    if s["street"] == "preflop":
+        p = pre(s["your_cards"])
+        if s["current_bet"] > bb:                           # somebody raised
+            if any(q["is_all_in"] for q in s["players"]) or owed >= 0.35 * s["your_stack"]:
+                return {"action": "call"} if p >= 0.72 else {"action": "fold"}
+            if p >= 0.72:
+                return {"action": "raise", "amount": max(s["min_raise_to"], 4 * s["current_bet"])}
+            return {"action": "call"} if p >= 0.40 and owed <= 5 * bb else {"action": "fold"}
+        return cc(s)                                        # limp, or check the big blind
+    return normal_post(s)
+''')
+
+BOTS["delayed"] = ('Always checks the flop, then bets the turn big with any pair or draw plus some nothing hands.',
+                   NORMAL + DRAW + '''
+
+def decide(s):
+    if s.get("type") == "warmup":
+        return {"action": "check"}
+    if s["street"] == "preflop":
+        return normal_pre(s)
+    owed, pot = s["amount_owed"], s["pot"]
+    m = made(s)
+    if s["street"] == "flop":
+        if s["can_check"]:
+            return {"action": "check"}
+        return {"action": "call"} if (m >= 1 or has_draw(s)) and owed <= pot - owed else {"action": "fold"}
+    if s["street"] == "turn" and s["can_check"]:
+        if m >= 1 or has_draw(s) or random.random() < 0.30:
+            return bet(s, 1.0)
+        return {"action": "check"}
+    return normal_post(s)
+''')
+
+BOTS["min_better"] = ('Bets the minimum on every street with any cards; continues against raises only with a pair or better.',
+                      '''
+def decide(s):
+    if s.get("type") == "warmup":
+        return {"action": "check"}
+    owed = s["amount_owed"]
+    strong = pre(s["your_cards"]) >= 0.55 if s["street"] == "preflop" else made(s) >= 1
+    if my_raises(s) == 0 and s["your_stack"] > owed and not any(q["is_all_in"] for q in s["players"]):
+        return {"action": "raise", "amount": s["min_raise_to"]}
+    if owed == 0:
+        return {"action": "check"}
+    return {"action": "call"} if strong else {"action": "fold"}
+''')
+
+BOTS["checkraiser"] = ('Never bets first; check-raises to 3x with top pair or better and a quarter of its draws and nothing hands.',
+                       NORMAL + DRAW + '''
+
+def decide(s):
+    if s.get("type") == "warmup":
+        return {"action": "check"}
+    if s["street"] == "preflop":
+        return normal_pre(s)
+    if s["can_check"]:
+        return {"action": "check"}
+    owed, pot = s["amount_owed"], s["pot"]
+    m = made(s)
+    if my_raises(s) == 0 and s["your_stack"] > owed and (tpgk(s) or (m == 0 and random.random() < 0.25)):
+        return {"action": "raise", "amount": max(s["min_raise_to"], 3 * s["current_bet"])}
+    if m >= 1 or has_draw(s):
+        return {"action": "call"} if owed <= pot - owed else {"action": "fold"}
+    return {"action": "fold"}
+''')
+
+BOTS["phase_shifter"] = ('Plays very tight for the first 40 hands, then switches to a maniac for the rest of the match.',
+                         NORMAL + '''
+
+def decide(s):
+    if s.get("type") == "warmup":
+        return {"action": "check"}
+    if s["hand_num"] < 40:
+        if s["street"] == "preflop":
+            if pre(s["your_cards"]) >= 0.76:
+                return {"action": "raise", "amount": max(s["min_raise_to"], 3 * s["current_bet"])}
+            return passive(s)
+        return normal_post(s) if tpgk(s) else passive(s)
+    r = random.random()
+    if r < 0.70:
+        return bet(s, random.uniform(0.75, 1.5))
+    if r < 0.95:
+        return cc(s)
+    return passive(s)
+''')
+
+BOTS["rare_overbet_bluffer"] = ('A normal tight style, but about one river in eight it bets 1.2 pots as a pure bluff.',
+                                NORMAL + '''
+
+def decide(s):
+    if s.get("type") == "warmup":
+        return {"action": "check"}
+    if s["street"] == "preflop":
+        return normal_pre(s)
+    if s["street"] == "river" and s["can_check"] and made(s) == 0 and random.random() < 0.28:
+        return bet(s, 1.2)                                  # the rare overbet is always a bluff
+    return normal_post(s)
+''')
+
+BOTS["stack_bully"] = ('Sizes its bets by our remaining stack instead of the pot, and shoves whenever we are under 25 big blinds.',
+                       NORMAL + '''
+
+def decide(s):
+    if s.get("type") == "warmup":
+        return {"action": "check"}
+    me = s["your_bot_id"]
+    opp = next(q for q in s["players"] if q["bot_id"] != me)
+    theirs = opp["stack"] + opp["bet_this_street"]
+    if theirs < 25 * s["blinds"]["bb"] and not opp["is_all_in"]:
+        return {"action": "all_in"}
+    if s["street"] == "preflop":
+        return normal_pre(s)
+    owed, pot = s["amount_owed"], s["pot"]
+    m = made(s)
+    if s["can_check"]:
+        if m >= 1 or random.random() < 0.35:
+            return {"action": "raise", "amount": max(s["min_raise_to"], int(s["current_bet"] + 0.20 * opp["stack"]))}
+        return {"action": "check"}
+    if m >= 2:
+        return {"action": "raise", "amount": max(s["min_raise_to"], int(s["current_bet"] + 0.40 * opp["stack"]))}
+    return {"action": "call"} if m == 1 and owed <= pot - owed else {"action": "fold"}
+''')
+
+BOTS["math_maniac"] = ('Calls by Monte Carlo equity against pot odds, but bluffs pot-sized about half the time it has nothing.',
+                       '''
+def decide(s):
+    if s.get("type") == "warmup":
+        return {"action": "check"}
+    eq = equity(s, 200)
+    owed, pot = s["amount_owed"], s["pot"]
+    if eq > 0.65:
+        return bet(s, 0.75)
+    if eq < 0.40 and my_raises(s) == 0 and random.random() < 0.5:
+        return bet(s, 1.0)                                  # nothing: a pot-sized bluff half the time
+    if owed == 0:
+        return {"action": "check"}
+    return {"action": "call"} if eq > owed / (pot + owed) else {"action": "fold"}
+''')
+
 BOTS["whitebox"] = ('An attacker written from the audit of our own bot: its three most exploitable habits.',
                     NORMAL + '''
 SHOVED = {"count": 0}
