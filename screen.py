@@ -47,13 +47,14 @@ def run(bot, opponents, pairs, seed, workers, real):
 
 def show(title, rows, seconds):
     print(f"\n{title}  ({seconds}s)")
-    print(f"  {'opponent':<13}{'win rate':>9}{'95% CI':>14}{'W/D/L':>13}{'crash':>7}"
+    print(f"  {'opponent':<14}{'win rate':>9}{'95% CI':>14}{'W/D/L':>13}{'adj chips/100':>15}{'crash':>7}"
           f"{'fixed':>7}{'slowest':>10}{'hands':>7}")
     for r in rows:
         p = r["pairings"]
-        print(f"  {r['name']:<13}{100 * r['match_win_rate']:>8.1f}%"
+        print(f"  {r['name']:<14}{100 * r['match_win_rate']:>8.1f}%"
               f"{100 * r['ci95'][0]:>8.1f}-{100 * r['ci95'][1]:<5.1f}"
               f"{str(p['win']) + '/' + str(p['draw']) + '/' + str(p['loss']):>13}"
+              f"{r['adj_chips_per_100']:>+15.0f}"
               f"{r['crashes'] + r['timeouts']:>7}{r['corrected_actions']:>7}"
               f"{r['slowest_ms']:>8.1f}ms{r['avg_hands']:>7.0f}")
     tot_m = sum(r["matches"] for r in rows)

@@ -328,6 +328,24 @@ def decide(s):
     return passive(s)
 ''')
 
+BOTS["smallbet_trap"] = ('Bets a third of the pot on every street, shoves only with two pair or better.', '''
+def decide(s):
+    if s.get("type") == "warmup":
+        return {"action": "check"}
+    owed, pot, bb = s["amount_owed"], s["pot"], s["blinds"]["bb"]
+    if s["street"] == "preflop":
+        if any(p["is_all_in"] for p in s["players"]) or owed >= 0.35 * s["your_stack"]:
+            return {"action": "call"} if pre(s["your_cards"]) >= 0.76 else {"action": "fold"}
+        if my_raises(s) == 0 and s["current_bet"] <= bb:
+            return {"action": "raise", "amount": 2 * bb}
+        return cc(s)
+    if made(s) >= 2:
+        return {"action": "all_in"}
+    if s["can_check"]:
+        return bet(s, 0.33)
+    return {"action": "call"} if owed <= 0.5 * (pot - owed) else {"action": "fold"}
+''')
+
 BOTS["adaptive"] = ('Tracks how often the opponent folds and bluffs more when they fold a lot.', '''
 SEEN, FOLDED = set(), set()
 

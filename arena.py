@@ -45,6 +45,41 @@ from pokercore.table import MatchConfig, play_match   # noqa: E402
 
 VALID = ("fold", "check", "call", "raise", "all_in")
 
+_RANKS, _SUITS = "23456789TJQKA", "shdc"
+_CARDS = {}
+
+
+def allin_equity(hole_a, hole_b, board):
+    """Chance that hole_a beats hole_b once the rest of the board is dealt (ties
+    count half). Exact on the flop and turn; preflop it samples 3,000 run-outs
+    with a seed taken from the cards, so the same deal always gives the same number."""
+    import itertools
+    import eval7
+    if not _CARDS:
+        for r in _RANKS:
+            for s in _SUITS:
+                _CARDS[r + s] = eval7.Card(r + s)
+    known = set(hole_a) | set(hole_b) | set(board)
+    deck = [_CARDS[c] for c in _CARDS if c not in known]
+    a = [_CARDS[c] for c in hole_a]
+    b = [_CARDS[c] for c in hole_b]
+    brd = [_CARDS[c] for c in board]
+    need = 5 - len(brd)
+    if need == 0:
+        runs = [()]
+    elif need <= 2:
+        runs = itertools.combinations(deck, need)
+    else:
+        rng = random.Random("".join(sorted(hole_a) + sorted(hole_b) + list(board)))
+        runs = (rng.sample(deck, need) for _ in range(3000))
+    score = n = 0
+    for run in runs:
+        full = brd + list(run)
+        x, y = eval7.evaluate(a + full), eval7.evaluate(b + full)
+        score += 1.0 if x > y else (0.5 if x == y else 0.0)
+        n += 1
+    return score / n
+
 
 def _bot_file(path):
     p = Path(path)
@@ -147,10 +182,13 @@ class Audit:
         self.n = 0
         self.per_bot = {}
         self.examples = []
+        self.hand = None                            # the hand being played, for the luck-adjusted score
 
     def _bot(self, name):
         return self.per_bot.setdefault(name, {"decisions": 0, "errors": 0, "corrected": 0,
-                                              "free_folds": 0, "data_bad": 0, "max_ms": 0.0, "sum_ms": 0.0})
+                                              "free_folds": 0, "data_bad": 0, "max_ms": 0.0, "sum_ms": 0.0,
+                                              "hands": 0, "chips": 0, "adj_chips": 0.0, "adj_bb": 0.0,
+                                              "allins_adjusted": 0})
 
     def emit(self, event_type, **data):
         event = {"i": self.n, "type": event_type, **data}
@@ -159,7 +197,17 @@ class Audit:
             self.events.append(event)
         if self.out:
             self.out.write(json.dumps(event, default=str) + "\n")
+        if event_type == "hand_start":
+            self.hand = {"hole": data["hole"], "stacks": data["stacks"], "bb": data["blinds"]["bb"],
+                         "board": [], "board_at_last_decision": [], "showdown": False}
+        elif event_type == "deal":
+            self.hand["board"] = list(data["board"])
+        elif event_type == "showdown":
+            self.hand["showdown"] = True
+        elif event_type == "hand_end":
+            self._score_hand(data["deltas"])
         if event_type == "decision":
+            self.hand["board_at_last_decision"] = list(self.hand["board"])
             b = self._bot(data["bot"])
             b["decisions"] += 1
             ms = data.get("think_ms") or 0.0
@@ -189,6 +237,28 @@ class Audit:
             if applied["action"] == "fold" and state.get("can_check"):
                 b["free_folds"] += 1
         return event
+
+    def _score_hand(self, deltas):
+        """Add the hand to each bot's totals. If the betting ended with a player
+        all-in before the river (so the remaining cards were just dealt out), the
+        luck-adjusted total gets what the hand was worth on average, not what the
+        run-out happened to give."""
+        h = self.hand
+        names = list(deltas)
+        adjusted = dict(deltas)
+        if h["showdown"] and len(names) == 2 and len(h["board_at_last_decision"]) < 5:
+            at_risk = min(h["stacks"].values())
+            a, b = names
+            eq = allin_equity(h["hole"][a], h["hole"][b], h["board_at_last_decision"])
+            adjusted = {a: (2 * eq - 1) * at_risk, b: (1 - 2 * eq) * at_risk}
+            for n in names:
+                self._bot(n)["allins_adjusted"] += 1
+        for n in names:
+            s = self._bot(n)
+            s["hands"] += 1
+            s["chips"] += deltas[n]
+            s["adj_chips"] += adjusted[n]
+            s["adj_bb"] += adjusted[n] / h["bb"]
 
     def close(self):
         if self.out:
@@ -228,6 +298,8 @@ def play_one(bot_a, bot_b, seed, first, real, log_path=None, keep=False):
         "decisions": a.get("decisions", 0), "errors": a.get("errors", 0),
         "corrected": a.get("corrected", 0), "free_folds": a.get("free_folds", 0),
         "data_bad": a.get("data_bad", 0),
+        "chips": a.get("chips", 0), "adj_chips": a.get("adj_chips", 0.0), "adj_bb": a.get("adj_bb", 0.0),
+        "allins_adjusted": a.get("allins_adjusted", 0),
         "max_ms": a.get("max_ms", 0.0), "sum_ms": a.get("sum_ms", 0.0),
         "timeouts": a_res.get("timeouts") or 0, "restarts": a_res.get("restarts") or 0,
         "examples": [e for e in audit.examples if e["bot"] == names[0]],
@@ -289,6 +361,13 @@ def summarise(bot_a, bot_b, pair_results, mode, seconds=None):
         "corrected_actions": sum(m["corrected"] for m in matches),
         "free_folds": sum(m["free_folds"] for m in matches),
         "data_bad": sum(m["data_bad"] for m in matches),
+        "hands": sum(m["hands"] for m in matches),
+        "chips_per_100": round(100 * sum(m["chips"] for m in matches) / max(1, sum(m["hands"] for m in matches)), 1),
+        "adj_chips_per_100": round(100 * sum(m["adj_chips"] for m in matches)
+                                   / max(1, sum(m["hands"] for m in matches)), 1),
+        "adj_bb_per_100": round(100 * sum(m["adj_bb"] for m in matches)
+                                / max(1, sum(m["hands"] for m in matches)), 2),
+        "allins_adjusted": sum(m["allins_adjusted"] for m in matches),
         "slowest_ms": round(max((m["max_ms"] for m in matches), default=0.0), 1),
         "avg_ms": round(sum(m["sum_ms"] for m in matches) / decisions, 2) if decisions else 0.0,
         "avg_hands": round(sum(m["hands"] for m in matches) / n, 1) if n else 0,
@@ -344,6 +423,9 @@ def main():
           f"(95% CI {100 * s['ci95'][0]:.1f}-{100 * s['ci95'][1]:.1f}%)")
     print(f"  pairings W/D/L      {p['win']}/{p['draw']}/{p['loss']}   "
           f"points per pairing {s['points_per_pairing']}")
+    print(f"  luck-adjusted       {s['adj_chips_per_100']:+.0f} chips per 100 hands "
+          f"({s['adj_bb_per_100']:+.1f} bb/100); actual {s['chips_per_100']:+.0f}; "
+          f"{s['allins_adjusted']} all-ins credited by equity")
     print(f"  crashes             {s['crashes']}   timeouts {s['timeouts']}   restarts {s['restarts']}")
     print(f"  corrected actions   {s['corrected_actions']}   (folds when a check was free: "
           f"{s['free_folds']})")
