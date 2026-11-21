@@ -1,0 +1,2360 @@
+{
+ "bot": "dev/v5b",
+ "seed": 1,
+ "screen": {
+  "pairs": null,
+  "alloc": "v4",
+  "targets": "allin,jam20,lateshover,nashpush,switcher,classifier,adaptive,overbet_bluffer,valueshover,smallbet_trap",
+  "plan": {
+   "caller": 50,
+   "adaptive": 500,
+   "aggressor": 150,
+   "allin": 500,
+   "bluffer": 150,
+   "chartbot": 150,
+   "classifier": 500,
+   "donkbettor": 150,
+   "earlyshover": 150,
+   "gto_charts": 500,
+   "jam20": 500,
+   "lateshover": 500,
+   "maniac": 150,
+   "mathematician": 50,
+   "mc_exploiter": 500,
+   "minraiser": 50,
+   "nashpush": 500,
+   "nit": 50,
+   "oddsizer": 150,
+   "overbet_bluffer": 500,
+   "potbettor": 150,
+   "potodds": 150,
+   "random": 150,
+   "ref_bot_2": 50,
+   "shark": 50,
+   "slowplayer": 50,
+   "smallbet_trap": 500,
+   "stealer": 150,
+   "switcher": 500,
+   "textbook_tag": 150,
+   "threebettor": 150,
+   "trapper": 50,
+   "v1_frozen": 500,
+   "v2_frozen": 500,
+   "valueshover": 500
+  },
+  "seconds": 1054.6,
+  "points_per_pairing": 0.7956,
+  "rows": [
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\mc_exploiter",
+    "name": "mc_exploiter",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 526,
+    "match_win_rate": 0.526,
+    "ci95": [
+     0.495,
+     0.5568
+    ],
+    "pairings": {
+     "win": 101,
+     "draw": 324,
+     "loss": 75
+    },
+    "points_per_pairing": 0.526,
+    "decisions": 136367,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 52106,
+    "chips_per_100": 998.0,
+    "adj_chips_per_100": 935.7,
+    "adj_bb_per_100": 8.71,
+    "allins_adjusted": 1035,
+    "depth": {
+     "short_hands": 5275,
+     "zone_hands": 8784,
+     "deep_hands": 38047,
+     "reached": [
+      380,
+      775
+     ],
+     "never_reached": [
+      146,
+      225
+     ],
+     "entered_ahead": [
+      293,
+      354
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      87,
+      421
+     ]
+    },
+    "slowest_ms": 45.3,
+    "avg_ms": 2.95,
+    "avg_hands": 52.1,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\v2_frozen",
+    "name": "v2_frozen",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 558,
+    "match_win_rate": 0.558,
+    "ci95": [
+     0.5271,
+     0.5885
+    ],
+    "pairings": {
+     "win": 105,
+     "draw": 348,
+     "loss": 47
+    },
+    "points_per_pairing": 0.558,
+    "decisions": 152739,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 67996,
+    "chips_per_100": 1706.0,
+    "adj_chips_per_100": 1726.8,
+    "adj_bb_per_100": 10.91,
+    "allins_adjusted": 1296,
+    "depth": {
+     "short_hands": 4966,
+     "zone_hands": 15861,
+     "deep_hands": 47169,
+     "reached": [
+      484,
+      843
+     ],
+     "never_reached": [
+      74,
+      157
+     ],
+     "entered_ahead": [
+      390,
+      480
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      94,
+      363
+     ]
+    },
+    "slowest_ms": 56.9,
+    "avg_ms": 2.98,
+    "avg_hands": 68.0,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\gto_charts",
+    "name": "gto_charts",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 562,
+    "match_win_rate": 0.562,
+    "ci95": [
+     0.5311,
+     0.5925
+    ],
+    "pairings": {
+     "win": 113,
+     "draw": 336,
+     "loss": 51
+    },
+    "points_per_pairing": 0.562,
+    "decisions": 123178,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 61943,
+    "chips_per_100": 2001.8,
+    "adj_chips_per_100": 2223.7,
+    "adj_bb_per_100": 29.22,
+    "allins_adjusted": 1352,
+    "depth": {
+     "short_hands": 4486,
+     "zone_hands": 15320,
+     "deep_hands": 42137,
+     "reached": [
+      400,
+      744
+     ],
+     "never_reached": [
+      162,
+      256
+     ],
+     "entered_ahead": [
+      325,
+      398
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      75,
+      346
+     ]
+    },
+    "slowest_ms": 59.7,
+    "avg_ms": 2.7,
+    "avg_hands": 61.9,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\v1_frozen",
+    "name": "v1_frozen",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 574,
+    "match_win_rate": 0.574,
+    "ci95": [
+     0.5431,
+     0.6043
+    ],
+    "pairings": {
+     "win": 110,
+     "draw": 354,
+     "loss": 36
+    },
+    "points_per_pairing": 0.574,
+    "decisions": 144479,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 66151,
+    "chips_per_100": 2237.3,
+    "adj_chips_per_100": 2253.0,
+    "adj_bb_per_100": 15.78,
+    "allins_adjusted": 1349,
+    "depth": {
+     "short_hands": 4484,
+     "zone_hands": 15993,
+     "deep_hands": 45674,
+     "reached": [
+      436,
+      772
+     ],
+     "never_reached": [
+      138,
+      228
+     ],
+     "entered_ahead": [
+      334,
+      414
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      102,
+      358
+     ]
+    },
+    "slowest_ms": 64.2,
+    "avg_ms": 2.94,
+    "avg_hands": 66.2,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\jam20",
+    "name": "jam20",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 627,
+    "match_win_rate": 0.627,
+    "ci95": [
+     0.5966,
+     0.6564
+    ],
+    "pairings": {
+     "win": 180,
+     "draw": 267,
+     "loss": 53
+    },
+    "points_per_pairing": 0.627,
+    "decisions": 122946,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 68837,
+    "chips_per_100": 3689.9,
+    "adj_chips_per_100": 3441.1,
+    "adj_bb_per_100": 39.53,
+    "allins_adjusted": 1701,
+    "depth": {
+     "short_hands": 4644,
+     "zone_hands": 19750,
+     "deep_hands": 44443,
+     "reached": [
+      491,
+      799
+     ],
+     "never_reached": [
+      136,
+      201
+     ],
+     "entered_ahead": [
+      389,
+      479
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      102,
+      320
+     ]
+    },
+    "slowest_ms": 53.3,
+    "avg_ms": 2.83,
+    "avg_hands": 68.8,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\allin",
+    "name": "allin",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 639,
+    "match_win_rate": 0.639,
+    "ci95": [
+     0.6088,
+     0.6682
+    ],
+    "pairings": {
+     "win": 200,
+     "draw": 239,
+     "loss": 61
+    },
+    "points_per_pairing": 0.639,
+    "decisions": 42386,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 34793,
+    "chips_per_100": 7990.1,
+    "adj_chips_per_100": 8418.1,
+    "adj_bb_per_100": 105.83,
+    "allins_adjusted": 2235,
+    "depth": {
+     "short_hands": 360,
+     "zone_hands": 4177,
+     "deep_hands": 30256,
+     "reached": [
+      432,
+      545
+     ],
+     "never_reached": [
+      207,
+      455
+     ],
+     "entered_ahead": [
+      369,
+      399
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      63,
+      146
+     ]
+    },
+    "slowest_ms": 6.7,
+    "avg_ms": 0.04,
+    "avg_hands": 34.8,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\threebettor",
+    "name": "threebettor",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 211,
+    "match_win_rate": 0.7033,
+    "ci95": [
+     0.6493,
+     0.7522
+    ],
+    "pairings": {
+     "win": 70,
+     "draw": 71,
+     "loss": 9
+    },
+    "points_per_pairing": 0.7033,
+    "decisions": 27225,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 7973,
+    "chips_per_100": 15301.6,
+    "adj_chips_per_100": 15638.3,
+    "adj_bb_per_100": 261.52,
+    "allins_adjusted": 402,
+    "depth": {
+     "short_hands": 314,
+     "zone_hands": 870,
+     "deep_hands": 6789,
+     "reached": [
+      118,
+      182
+     ],
+     "never_reached": [
+      93,
+      118
+     ],
+     "entered_ahead": [
+      95,
+      106
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      23,
+      76
+     ]
+    },
+    "slowest_ms": 36.1,
+    "avg_ms": 2.88,
+    "avg_hands": 26.6,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\textbook_tag",
+    "name": "textbook_tag",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 213,
+    "match_win_rate": 0.71,
+    "ci95": [
+     0.6563,
+     0.7584
+    ],
+    "pairings": {
+     "win": 69,
+     "draw": 75,
+     "loss": 6
+    },
+    "points_per_pairing": 0.71,
+    "decisions": 25521,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 16579,
+    "chips_per_100": 7600.0,
+    "adj_chips_per_100": 7582.2,
+    "adj_bb_per_100": 93.23,
+    "allins_adjusted": 405,
+    "depth": {
+     "short_hands": 2024,
+     "zone_hands": 3372,
+     "deep_hands": 11183,
+     "reached": [
+      135,
+      200
+     ],
+     "never_reached": [
+      78,
+      100
+     ],
+     "entered_ahead": [
+      110,
+      118
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      25,
+      82
+     ]
+    },
+    "slowest_ms": 42.7,
+    "avg_ms": 2.7,
+    "avg_hands": 55.3,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\classifier",
+    "name": "classifier",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 715,
+    "match_win_rate": 0.715,
+    "ci95": [
+     0.6862,
+     0.7421
+    ],
+    "pairings": {
+     "win": 237,
+     "draw": 241,
+     "loss": 22
+    },
+    "points_per_pairing": 0.715,
+    "decisions": 119526,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 67766,
+    "chips_per_100": 6345.4,
+    "adj_chips_per_100": 6488.8,
+    "adj_bb_per_100": 55.31,
+    "allins_adjusted": 1263,
+    "depth": {
+     "short_hands": 7971,
+     "zone_hands": 15016,
+     "deep_hands": 44779,
+     "reached": [
+      544,
+      767
+     ],
+     "never_reached": [
+      171,
+      233
+     ],
+     "entered_ahead": [
+      426,
+      469
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      118,
+      298
+     ]
+    },
+    "slowest_ms": 63.1,
+    "avg_ms": 2.84,
+    "avg_hands": 67.8,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\lateshover",
+    "name": "lateshover",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 719,
+    "match_win_rate": 0.719,
+    "ci95": [
+     0.6903,
+     0.746
+    ],
+    "pairings": {
+     "win": 244,
+     "draw": 231,
+     "loss": 25
+    },
+    "points_per_pairing": 0.719,
+    "decisions": 95313,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 68355,
+    "chips_per_100": 6407.7,
+    "adj_chips_per_100": 6336.4,
+    "adj_bb_per_100": 68.94,
+    "allins_adjusted": 1518,
+    "depth": {
+     "short_hands": 4023,
+     "zone_hands": 18464,
+     "deep_hands": 45868,
+     "reached": [
+      548,
+      793
+     ],
+     "never_reached": [
+      171,
+      207
+     ],
+     "entered_ahead": [
+      473,
+      565
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      75,
+      228
+     ]
+    },
+    "slowest_ms": 38.4,
+    "avg_ms": 2.24,
+    "avg_hands": 68.4,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\stealer",
+    "name": "stealer",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 218,
+    "match_win_rate": 0.7267,
+    "ci95": [
+     0.6736,
+     0.774
+    ],
+    "pairings": {
+     "win": 73,
+     "draw": 72,
+     "loss": 5
+    },
+    "points_per_pairing": 0.7267,
+    "decisions": 25644,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 7573,
+    "chips_per_100": 17958.5,
+    "adj_chips_per_100": 18450.9,
+    "adj_bb_per_100": 329.16,
+    "allins_adjusted": 314,
+    "depth": {
+     "short_hands": 314,
+     "zone_hands": 676,
+     "deep_hands": 6583,
+     "reached": [
+      107,
+      161
+     ],
+     "never_reached": [
+      111,
+      139
+     ],
+     "entered_ahead": [
+      94,
+      101
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      13,
+      60
+     ]
+    },
+    "slowest_ms": 44.4,
+    "avg_ms": 2.88,
+    "avg_hands": 25.2,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\switcher",
+    "name": "switcher",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 733,
+    "match_win_rate": 0.733,
+    "ci95": [
+     0.7047,
+     0.7595
+    ],
+    "pairings": {
+     "win": 260,
+     "draw": 213,
+     "loss": 27
+    },
+    "points_per_pairing": 0.733,
+    "decisions": 48501,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 29913,
+    "chips_per_100": 15578.5,
+    "adj_chips_per_100": 16120.4,
+    "adj_bb_per_100": 200.79,
+    "allins_adjusted": 1843,
+    "depth": {
+     "short_hands": 879,
+     "zone_hands": 2303,
+     "deep_hands": 26731,
+     "reached": [
+      315,
+      436
+     ],
+     "never_reached": [
+      418,
+      564
+     ],
+     "entered_ahead": [
+      264,
+      277
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      51,
+      159
+     ]
+    },
+    "slowest_ms": 42.4,
+    "avg_ms": 2.9,
+    "avg_hands": 29.9,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\earlyshover",
+    "name": "earlyshover",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 221,
+    "match_win_rate": 0.7367,
+    "ci95": [
+     0.6841,
+     0.7833
+    ],
+    "pairings": {
+     "win": 77,
+     "draw": 67,
+     "loss": 6
+    },
+    "points_per_pairing": 0.7367,
+    "decisions": 29880,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 16993,
+    "chips_per_100": 8356.4,
+    "adj_chips_per_100": 7992.2,
+    "adj_bb_per_100": 95.91,
+    "allins_adjusted": 545,
+    "depth": {
+     "short_hands": 2072,
+     "zone_hands": 3274,
+     "deep_hands": 11647,
+     "reached": [
+      127,
+      178
+     ],
+     "never_reached": [
+      94,
+      122
+     ],
+     "entered_ahead": [
+      90,
+      98
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      37,
+      80
+     ]
+    },
+    "slowest_ms": 60.3,
+    "avg_ms": 3.71,
+    "avg_hands": 56.6,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\adaptive",
+    "name": "adaptive",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 739,
+    "match_win_rate": 0.739,
+    "ci95": [
+     0.7109,
+     0.7653
+    ],
+    "pairings": {
+     "win": 254,
+     "draw": 231,
+     "loss": 15
+    },
+    "points_per_pairing": 0.739,
+    "decisions": 58761,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 22115,
+    "chips_per_100": 21614.3,
+    "adj_chips_per_100": 20830.2,
+    "adj_bb_per_100": 360.41,
+    "allins_adjusted": 1315,
+    "depth": {
+     "short_hands": 838,
+     "zone_hands": 2063,
+     "deep_hands": 19214,
+     "reached": [
+      325,
+      435
+     ],
+     "never_reached": [
+      414,
+      565
+     ],
+     "entered_ahead": [
+      299,
+      314
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      26,
+      121
+     ]
+    },
+    "slowest_ms": 50.5,
+    "avg_ms": 2.94,
+    "avg_hands": 22.1,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\valueshover",
+    "name": "valueshover",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 747,
+    "match_win_rate": 0.747,
+    "ci95": [
+     0.7191,
+     0.773
+    ],
+    "pairings": {
+     "win": 271,
+     "draw": 205,
+     "loss": 24
+    },
+    "points_per_pairing": 0.747,
+    "decisions": 131019,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 74045,
+    "chips_per_100": 6671.6,
+    "adj_chips_per_100": 6757.4,
+    "adj_bb_per_100": 45.26,
+    "allins_adjusted": 1774,
+    "depth": {
+     "short_hands": 9915,
+     "zone_hands": 16265,
+     "deep_hands": 47865,
+     "reached": [
+      541,
+      711
+     ],
+     "never_reached": [
+      206,
+      289
+     ],
+     "entered_ahead": [
+      395,
+      433
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      146,
+      278
+     ]
+    },
+    "slowest_ms": 60.9,
+    "avg_ms": 3.12,
+    "avg_hands": 74.0,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\chartbot",
+    "name": "chartbot",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 231,
+    "match_win_rate": 0.77,
+    "ci95": [
+     0.7191,
+     0.814
+    ],
+    "pairings": {
+     "win": 89,
+     "draw": 53,
+     "loss": 8
+    },
+    "points_per_pairing": 0.77,
+    "decisions": 31109,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 23889,
+    "chips_per_100": 6781.4,
+    "adj_chips_per_100": 6584.3,
+    "adj_bb_per_100": 51.78,
+    "allins_adjusted": 496,
+    "depth": {
+     "short_hands": 3309,
+     "zone_hands": 5966,
+     "deep_hands": 14614,
+     "reached": [
+      182,
+      233
+     ],
+     "never_reached": [
+      49,
+      67
+     ],
+     "entered_ahead": [
+      142,
+      162
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      40,
+      71
+     ]
+    },
+    "slowest_ms": 54.1,
+    "avg_ms": 2.36,
+    "avg_hands": 79.6,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\donkbettor",
+    "name": "donkbettor",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 239,
+    "match_win_rate": 0.7967,
+    "ci95": [
+     0.7475,
+     0.8383
+    ],
+    "pairings": {
+     "win": 93,
+     "draw": 53,
+     "loss": 4
+    },
+    "points_per_pairing": 0.7967,
+    "decisions": 43631,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 17813,
+    "chips_per_100": 9992.7,
+    "adj_chips_per_100": 9832.1,
+    "adj_bb_per_100": 97.54,
+    "allins_adjusted": 493,
+    "depth": {
+     "short_hands": 2940,
+     "zone_hands": 3043,
+     "deep_hands": 11830,
+     "reached": [
+      169,
+      222
+     ],
+     "never_reached": [
+      70,
+      78
+     ],
+     "entered_ahead": [
+      131,
+      141
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      38,
+      81
+     ]
+    },
+    "slowest_ms": 46.7,
+    "avg_ms": 3.01,
+    "avg_hands": 59.4,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\potbettor",
+    "name": "potbettor",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 239,
+    "match_win_rate": 0.7967,
+    "ci95": [
+     0.7475,
+     0.8383
+    ],
+    "pairings": {
+     "win": 92,
+     "draw": 55,
+     "loss": 3
+    },
+    "points_per_pairing": 0.7967,
+    "decisions": 9537,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 2911,
+    "chips_per_100": 61147.4,
+    "adj_chips_per_100": 61021.6,
+    "adj_bb_per_100": 1214.73,
+    "allins_adjusted": 574,
+    "depth": {
+     "short_hands": 169,
+     "zone_hands": 266,
+     "deep_hands": 2476,
+     "reached": [
+      85,
+      109
+     ],
+     "never_reached": [
+      154,
+      191
+     ],
+     "entered_ahead": [
+      81,
+      81
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      4,
+      28
+     ]
+    },
+    "slowest_ms": 23.9,
+    "avg_ms": 3.16,
+    "avg_hands": 9.7,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\random",
+    "name": "random",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 242,
+    "match_win_rate": 0.8067,
+    "ci95": [
+     0.7582,
+     0.8474
+    ],
+    "pairings": {
+     "win": 100,
+     "draw": 42,
+     "loss": 8
+    },
+    "points_per_pairing": 0.8067,
+    "decisions": 26092,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 13213,
+    "chips_per_100": 13925.7,
+    "adj_chips_per_100": 14248.0,
+    "adj_bb_per_100": 185.21,
+    "allins_adjusted": 585,
+    "depth": {
+     "short_hands": 690,
+     "zone_hands": 2902,
+     "deep_hands": 9621,
+     "reached": [
+      149,
+      193
+     ],
+     "never_reached": [
+      93,
+      107
+     ],
+     "entered_ahead": [
+      120,
+      126
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      29,
+      67
+     ]
+    },
+    "slowest_ms": 42.5,
+    "avg_ms": 3.31,
+    "avg_hands": 44.0,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\maniac",
+    "name": "maniac",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 249,
+    "match_win_rate": 0.83,
+    "ci95": [
+     0.7834,
+     0.8683
+    ],
+    "pairings": {
+     "win": 103,
+     "draw": 43,
+     "loss": 4
+    },
+    "points_per_pairing": 0.83,
+    "decisions": 10805,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 3710,
+    "chips_per_100": 53369.3,
+    "adj_chips_per_100": 53799.5,
+    "adj_bb_per_100": 1027.8,
+    "allins_adjusted": 464,
+    "depth": {
+     "short_hands": 142,
+     "zone_hands": 326,
+     "deep_hands": 3242,
+     "reached": [
+      82,
+      91
+     ],
+     "never_reached": [
+      167,
+      209
+     ],
+     "entered_ahead": [
+      81,
+      81
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      1,
+      10
+     ]
+    },
+    "slowest_ms": 25.6,
+    "avg_ms": 3.43,
+    "avg_hands": 12.4,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\overbet_bluffer",
+    "name": "overbet_bluffer",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 832,
+    "match_win_rate": 0.832,
+    "ci95": [
+     0.8076,
+     0.8539
+    ],
+    "pairings": {
+     "win": 339,
+     "draw": 154,
+     "loss": 7
+    },
+    "points_per_pairing": 0.832,
+    "decisions": 122064,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 70735,
+    "chips_per_100": 9387.1,
+    "adj_chips_per_100": 9486.0,
+    "adj_bb_per_100": 70.89,
+    "allins_adjusted": 1917,
+    "depth": {
+     "short_hands": 11254,
+     "zone_hands": 16317,
+     "deep_hands": 43164,
+     "reached": [
+      583,
+      666
+     ],
+     "never_reached": [
+      249,
+      334
+     ],
+     "entered_ahead": [
+      458,
+      476
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      125,
+      190
+     ]
+    },
+    "slowest_ms": 54.1,
+    "avg_ms": 2.77,
+    "avg_hands": 70.7,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\oddsizer",
+    "name": "oddsizer",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 250,
+    "match_win_rate": 0.8333,
+    "ci95": [
+     0.787,
+     0.8712
+    ],
+    "pairings": {
+     "win": 101,
+     "draw": 48,
+     "loss": 1
+    },
+    "points_per_pairing": 0.8333,
+    "decisions": 23165,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 25533,
+    "chips_per_100": 7833.0,
+    "adj_chips_per_100": 8620.8,
+    "adj_bb_per_100": 59.85,
+    "allins_adjusted": 604,
+    "depth": {
+     "short_hands": 3073,
+     "zone_hands": 6734,
+     "deep_hands": 15726,
+     "reached": [
+      181,
+      216
+     ],
+     "never_reached": [
+      69,
+      84
+     ],
+     "entered_ahead": [
+      151,
+      168
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      30,
+      48
+     ]
+    },
+    "slowest_ms": 31.9,
+    "avg_ms": 2.09,
+    "avg_hands": 85.1,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\bluffer",
+    "name": "bluffer",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 258,
+    "match_win_rate": 0.86,
+    "ci95": [
+     0.8162,
+     0.8947
+    ],
+    "pairings": {
+     "win": 109,
+     "draw": 40,
+     "loss": 1
+    },
+    "points_per_pairing": 0.86,
+    "decisions": 22947,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 7840,
+    "chips_per_100": 27551.0,
+    "adj_chips_per_100": 28146.5,
+    "adj_bb_per_100": 448.92,
+    "allins_adjusted": 362,
+    "depth": {
+     "short_hands": 957,
+     "zone_hands": 894,
+     "deep_hands": 5989,
+     "reached": [
+      143,
+      167
+     ],
+     "never_reached": [
+      115,
+      133
+     ],
+     "entered_ahead": [
+      131,
+      133
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      12,
+      34
+     ]
+    },
+    "slowest_ms": 24.6,
+    "avg_ms": 3.71,
+    "avg_hands": 26.1,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\nashpush",
+    "name": "nashpush",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 874,
+    "match_win_rate": 0.874,
+    "ci95": [
+     0.852,
+     0.8931
+    ],
+    "pairings": {
+     "win": 377,
+     "draw": 120,
+     "loss": 3
+    },
+    "points_per_pairing": 0.874,
+    "decisions": 59611,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 98606,
+    "chips_per_100": 7585.7,
+    "adj_chips_per_100": 7547.7,
+    "adj_bb_per_100": 53.67,
+    "allins_adjusted": 2007,
+    "depth": {
+     "short_hands": 7835,
+     "zone_hands": 31869,
+     "deep_hands": 58902,
+     "reached": [
+      833,
+      958
+     ],
+     "never_reached": [
+      41,
+      42
+     ],
+     "entered_ahead": [
+      823,
+      936
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      10,
+      22
+     ]
+    },
+    "slowest_ms": 15.7,
+    "avg_ms": 0.07,
+    "avg_hands": 98.6,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\aggressor",
+    "name": "aggressor",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 263,
+    "match_win_rate": 0.8767,
+    "ci95": [
+     0.8346,
+     0.9092
+    ],
+    "pairings": {
+     "win": 114,
+     "draw": 35,
+     "loss": 1
+    },
+    "points_per_pairing": 0.8767,
+    "decisions": 11278,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 4087,
+    "chips_per_100": 55297.3,
+    "adj_chips_per_100": 53627.5,
+    "adj_bb_per_100": 1000.63,
+    "allins_adjusted": 508,
+    "depth": {
+     "short_hands": 192,
+     "zone_hands": 379,
+     "deep_hands": 3516,
+     "reached": [
+      84,
+      97
+     ],
+     "never_reached": [
+      179,
+      203
+     ],
+     "entered_ahead": [
+      80,
+      81
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      4,
+      16
+     ]
+    },
+    "slowest_ms": 23.1,
+    "avg_ms": 2.93,
+    "avg_hands": 13.6,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\trapper",
+    "name": "trapper",
+    "mode": "in-process",
+    "pairs": 50,
+    "matches": 100,
+    "match_wins": 88,
+    "match_win_rate": 0.88,
+    "ci95": [
+     0.8019,
+     0.93
+    ],
+    "pairings": {
+     "win": 39,
+     "draw": 10,
+     "loss": 1
+    },
+    "points_per_pairing": 0.88,
+    "decisions": 14212,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 6644,
+    "chips_per_100": 11438.9,
+    "adj_chips_per_100": 11537.8,
+    "adj_bb_per_100": 106.94,
+    "allins_adjusted": 129,
+    "depth": {
+     "short_hands": 1146,
+     "zone_hands": 1340,
+     "deep_hands": 4158,
+     "reached": [
+      67,
+      77
+     ],
+     "never_reached": [
+      21,
+      23
+     ],
+     "entered_ahead": [
+      61,
+      62
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      6,
+      15
+     ]
+    },
+    "slowest_ms": 41.9,
+    "avg_ms": 2.46,
+    "avg_hands": 66.4,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\potodds",
+    "name": "potodds",
+    "mode": "in-process",
+    "pairs": 150,
+    "matches": 300,
+    "match_wins": 267,
+    "match_win_rate": 0.89,
+    "ci95": [
+     0.8495,
+     0.9206
+    ],
+    "pairings": {
+     "win": 118,
+     "draw": 31,
+     "loss": 1
+    },
+    "points_per_pairing": 0.89,
+    "decisions": 30402,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 9354,
+    "chips_per_100": 25016.0,
+    "adj_chips_per_100": 25329.0,
+    "adj_bb_per_100": 363.19,
+    "allins_adjusted": 325,
+    "depth": {
+     "short_hands": 518,
+     "zone_hands": 1240,
+     "deep_hands": 7596,
+     "reached": [
+      140,
+      157
+     ],
+     "never_reached": [
+      127,
+      143
+     ],
+     "entered_ahead": [
+      122,
+      124
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      18,
+      33
+     ]
+    },
+    "slowest_ms": 28.2,
+    "avg_ms": 3.48,
+    "avg_hands": 31.2,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\slowplayer",
+    "name": "slowplayer",
+    "mode": "in-process",
+    "pairs": 50,
+    "matches": 100,
+    "match_wins": 91,
+    "match_win_rate": 0.91,
+    "ci95": [
+     0.8377,
+     0.9519
+    ],
+    "pairings": {
+     "win": 41,
+     "draw": 9,
+     "loss": 0
+    },
+    "points_per_pairing": 0.91,
+    "decisions": 14323,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 8376,
+    "chips_per_100": 9789.9,
+    "adj_chips_per_100": 10007.5,
+    "adj_bb_per_100": 77.66,
+    "allins_adjusted": 210,
+    "depth": {
+     "short_hands": 1364,
+     "zone_hands": 2041,
+     "deep_hands": 4971,
+     "reached": [
+      72,
+      80
+     ],
+     "never_reached": [
+      19,
+      20
+     ],
+     "entered_ahead": [
+      61,
+      66
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      11,
+      14
+     ]
+    },
+    "slowest_ms": 56.1,
+    "avg_ms": 2.78,
+    "avg_hands": 83.8,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\smallbet_trap",
+    "name": "smallbet_trap",
+    "mode": "in-process",
+    "pairs": 500,
+    "matches": 1000,
+    "match_wins": 914,
+    "match_win_rate": 0.914,
+    "ci95": [
+     0.895,
+     0.9298
+    ],
+    "pairings": {
+     "win": 417,
+     "draw": 80,
+     "loss": 3
+    },
+    "points_per_pairing": 0.914,
+    "decisions": 167139,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 51559,
+    "chips_per_100": 16059.3,
+    "adj_chips_per_100": 16125.6,
+    "adj_bb_per_100": 162.81,
+    "allins_adjusted": 1705,
+    "depth": {
+     "short_hands": 5850,
+     "zone_hands": 7600,
+     "deep_hands": 38109,
+     "reached": [
+      628,
+      674
+     ],
+     "never_reached": [
+      286,
+      326
+     ],
+     "entered_ahead": [
+      559,
+      572
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      69,
+      102
+     ]
+    },
+    "slowest_ms": 65.0,
+    "avg_ms": 3.84,
+    "avg_hands": 51.6,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\minraiser",
+    "name": "minraiser",
+    "mode": "in-process",
+    "pairs": 50,
+    "matches": 100,
+    "match_wins": 96,
+    "match_win_rate": 0.96,
+    "ci95": [
+     0.9016,
+     0.9843
+    ],
+    "pairings": {
+     "win": 46,
+     "draw": 4,
+     "loss": 0
+    },
+    "points_per_pairing": 0.96,
+    "decisions": 4660,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 924,
+    "chips_per_100": 99567.1,
+    "adj_chips_per_100": 96289.8,
+    "adj_bb_per_100": 1877.28,
+    "allins_adjusted": 156,
+    "depth": {
+     "short_hands": 63,
+     "zone_hands": 87,
+     "deep_hands": 774,
+     "reached": [
+      38,
+      40
+     ],
+     "never_reached": [
+      58,
+      60
+     ],
+     "entered_ahead": [
+      37,
+      37
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      1,
+      3
+     ]
+    },
+    "slowest_ms": 24.8,
+    "avg_ms": 3.86,
+    "avg_hands": 9.2,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "bots\\caller",
+    "name": "caller",
+    "mode": "in-process",
+    "pairs": 50,
+    "matches": 100,
+    "match_wins": 100,
+    "match_win_rate": 1.0,
+    "ci95": [
+     0.963,
+     1.0
+    ],
+    "pairings": {
+     "win": 50,
+     "draw": 0,
+     "loss": 0
+    },
+    "points_per_pairing": 1.0,
+    "decisions": 7117,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 1973,
+    "chips_per_100": 50684.2,
+    "adj_chips_per_100": 50345.6,
+    "adj_bb_per_100": 898.91,
+    "allins_adjusted": 46,
+    "depth": {
+     "short_hands": 63,
+     "zone_hands": 181,
+     "deep_hands": 1729,
+     "reached": [
+      52,
+      52
+     ],
+     "never_reached": [
+      48,
+      48
+     ],
+     "entered_ahead": [
+      51,
+      51
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      1,
+      1
+     ]
+    },
+    "slowest_ms": 43.5,
+    "avg_ms": 2.05,
+    "avg_hands": 19.7,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\mathematician",
+    "name": "mathematician",
+    "mode": "in-process",
+    "pairs": 50,
+    "matches": 100,
+    "match_wins": 100,
+    "match_win_rate": 1.0,
+    "ci95": [
+     0.963,
+     1.0
+    ],
+    "pairings": {
+     "win": 50,
+     "draw": 0,
+     "loss": 0
+    },
+    "points_per_pairing": 1.0,
+    "decisions": 14808,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 8513,
+    "chips_per_100": 11746.7,
+    "adj_chips_per_100": 11704.3,
+    "adj_bb_per_100": 87.09,
+    "allins_adjusted": 181,
+    "depth": {
+     "short_hands": 1639,
+     "zone_hands": 1816,
+     "deep_hands": 5058,
+     "reached": [
+      100,
+      100
+     ],
+     "never_reached": [
+      0,
+      0
+     ],
+     "entered_ahead": [
+      100,
+      100
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      0,
+      0
+     ]
+    },
+    "slowest_ms": 19.6,
+    "avg_ms": 1.48,
+    "avg_hands": 85.1,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\nit",
+    "name": "nit",
+    "mode": "in-process",
+    "pairs": 50,
+    "matches": 100,
+    "match_wins": 100,
+    "match_win_rate": 1.0,
+    "ci95": [
+     0.963,
+     1.0
+    ],
+    "pairings": {
+     "win": 50,
+     "draw": 0,
+     "loss": 0
+    },
+    "points_per_pairing": 1.0,
+    "decisions": 5501,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 9892,
+    "chips_per_100": 10109.2,
+    "adj_chips_per_100": 10143.9,
+    "adj_bb_per_100": 63.57,
+    "allins_adjusted": 210,
+    "depth": {
+     "short_hands": 1934,
+     "zone_hands": 2188,
+     "deep_hands": 5770,
+     "reached": [
+      95,
+      95
+     ],
+     "never_reached": [
+      5,
+      5
+     ],
+     "entered_ahead": [
+      91,
+      91
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      4,
+      4
+     ]
+    },
+    "slowest_ms": 22.3,
+    "avg_ms": 0.29,
+    "avg_hands": 98.9,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\ref_bot_2",
+    "name": "ref_bot_2",
+    "mode": "in-process",
+    "pairs": 50,
+    "matches": 100,
+    "match_wins": 100,
+    "match_win_rate": 1.0,
+    "ci95": [
+     0.963,
+     1.0
+    ],
+    "pairings": {
+     "win": 50,
+     "draw": 0,
+     "loss": 0
+    },
+    "points_per_pairing": 1.0,
+    "decisions": 14808,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 8513,
+    "chips_per_100": 11746.7,
+    "adj_chips_per_100": 11704.3,
+    "adj_bb_per_100": 87.09,
+    "allins_adjusted": 181,
+    "depth": {
+     "short_hands": 1639,
+     "zone_hands": 1816,
+     "deep_hands": 5058,
+     "reached": [
+      100,
+      100
+     ],
+     "never_reached": [
+      0,
+      0
+     ],
+     "entered_ahead": [
+      100,
+      100
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      0,
+      0
+     ]
+    },
+    "slowest_ms": 36.7,
+    "avg_ms": 1.49,
+    "avg_hands": 85.1,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   },
+   {
+    "bot": "dev/v5b",
+    "opponent": "sparring\\shark",
+    "name": "shark",
+    "mode": "in-process",
+    "pairs": 50,
+    "matches": 100,
+    "match_wins": 100,
+    "match_win_rate": 1.0,
+    "ci95": [
+     0.963,
+     1.0
+    ],
+    "pairings": {
+     "win": 50,
+     "draw": 0,
+     "loss": 0
+    },
+    "points_per_pairing": 1.0,
+    "decisions": 5128,
+    "crashes": 0,
+    "timeouts": 0,
+    "restarts": 0,
+    "corrected_actions": 0,
+    "free_folds": 0,
+    "data_bad": 0,
+    "no_debug": 0,
+    "hands": 9893,
+    "chips_per_100": 10108.2,
+    "adj_chips_per_100": 10125.9,
+    "adj_bb_per_100": 65.23,
+    "allins_adjusted": 232,
+    "depth": {
+     "short_hands": 1938,
+     "zone_hands": 2132,
+     "deep_hands": 5823,
+     "reached": [
+      100,
+      100
+     ],
+     "never_reached": [
+      0,
+      0
+     ],
+     "entered_ahead": [
+      100,
+      100
+     ],
+     "entered_even": [
+      0,
+      0
+     ],
+     "entered_behind": [
+      0,
+      0
+     ]
+    },
+    "slowest_ms": 7.8,
+    "avg_ms": 0.09,
+    "avg_hands": 98.9,
+    "hand_limit_matches": 0,
+    "runner_crashes": 0,
+    "runner_crash_text": [],
+    "examples": [],
+    "seconds": null
+   }
+  ]
+ }
+}

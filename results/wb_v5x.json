@@ -1,0 +1,66 @@
+{
+  "bot": "dev/v5x",
+  "opponent": "sparring/whitebox",
+  "name": "whitebox",
+  "mode": "in-process",
+  "pairs": 250,
+  "matches": 500,
+  "match_wins": 372,
+  "match_win_rate": 0.744,
+  "ci95": [
+    0.704,
+    0.7803
+  ],
+  "pairings": {
+    "win": 136,
+    "draw": 100,
+    "loss": 14
+  },
+  "points_per_pairing": 0.744,
+  "decisions": 26941,
+  "crashes": 0,
+  "timeouts": 0,
+  "restarts": 0,
+  "corrected_actions": 0,
+  "free_folds": 0,
+  "data_bad": 0,
+  "no_debug": 0,
+  "hands": 26118,
+  "chips_per_100": 9342.2,
+  "adj_chips_per_100": 9287.6,
+  "adj_bb_per_100": 103.56,
+  "allins_adjusted": 1007,
+  "depth": {
+    "short_hands": 3475,
+    "zone_hands": 5022,
+    "deep_hands": 17621,
+    "reached": [
+      257,
+      319
+    ],
+    "never_reached": [
+      115,
+      181
+    ],
+    "entered_ahead": [
+      214,
+      227
+    ],
+    "entered_even": [
+      0,
+      0
+    ],
+    "entered_behind": [
+      43,
+      92
+    ]
+  },
+  "slowest_ms": 33.5,
+  "avg_ms": 0.86,
+  "avg_hands": 52.2,
+  "hand_limit_matches": 0,
+  "runner_crashes": 0,
+  "runner_crash_text": [],
+  "examples": [],
+  "seconds": 28.1
+}

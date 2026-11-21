@@ -1,0 +1,237 @@
+{
+ "whitebox": {
+  "hands": 26010,
+  "chips": 2360000,
+  "bbs": 26846.52941666668,
+  "paths": {
+   "SB: we open, they shove": [
+    1858,
+    1858,
+    1716,
+    374898,
+    7497.960000000001
+   ],
+   "BB: we face a raise": [
+    6978,
+    6978,
+    6336,
+    427388,
+    7847.441833333334
+   ],
+   "BB: they fold": [
+    5752,
+    0,
+    0,
+    410870,
+    2907.699999999999
+   ],
+   "SB: we fold": [
+    4515,
+    0,
+    0,
+    -238310,
+    -2264.9999999999995
+   ],
+   "SB: we open, they re-raise": [
+    1394,
+    1394,
+    1057,
+    187658,
+    3011.811666666666
+   ],
+   "SB: we open, they fold": [
+    2117,
+    0,
+    0,
+    346310,
+    2126.2
+   ],
+   "SB: we open, they call": [
+    1654,
+    0,
+    0,
+    566449,
+    4844.8875
+   ],
+   "BB: we face a shove": [
+    170,
+    119,
+    4,
+    -18956,
+    -75.08658333333332
+   ],
+   "SB: we limp": [
+    191,
+    0,
+    0,
+    -1001,
+    -2.465
+   ],
+   "SB: we shove, they fold": [
+    1195,
+    0,
+    0,
+    372640,
+    1235.3999999999996
+   ],
+   "blinds force an all-in": [
+    129,
+    0,
+    0,
+    446,
+    4.599166666666667
+   ],
+   "SB: we shove, they call": [
+    57,
+    0,
+    0,
+    -68392,
+    -286.9191666666667
+   ]
+  },
+  "post": {
+   "we call their bet, win": [
+    269,
+    1373055,
+    9598.95208333334
+   ],
+   "they fold to our bet": [
+    762,
+    509370,
+    3213.6392500000006
+   ],
+   "we fold to a bet": [
+    644,
+    -544809,
+    -3357.255000000001
+   ],
+   "we call their bet, lose": [
+    230,
+    -979898,
+    -6484.371250000001
+   ],
+   "they call our bet, tie": [
+    2,
+    0,
+    0.0
+   ],
+   "they call our bet, win": [
+    58,
+    346584,
+    3414.357499999999
+   ],
+   "they call our bet, lose": [
+    11,
+    -55448,
+    -418.99333333333334
+   ],
+   "we call their bet, tie": [
+    25,
+    0,
+    0.0
+   ]
+  },
+  "allin": {
+   "preflop": [
+    604,
+    295.0,
+    453504,
+    10873.915083333335,
+    306.0858999999999
+   ],
+   "postflop": [
+    351,
+    202.0,
+    459630,
+    3839.776666666668,
+    184.88670000000005
+   ]
+  },
+  "faced": [
+   2248,
+   644
+  ],
+  "decided": {
+   "label": "whitebox",
+   "matches": 500,
+   "pairs": 250,
+   "W": 131,
+   "D": 106,
+   "L": 13,
+   "biggest_hand_quartiles": [
+    10,
+    32,
+    62
+   ],
+   "match_length_quartiles": [
+    22,
+    43,
+    77
+   ],
+   "biggest_hand_kind": {
+    "no all-in": 31.2,
+    "preflop": 38.6,
+    "postflop": 30.2
+   },
+   "last_hand_kind": {
+    "preflop": 50.8,
+    "no all-in": 12.4,
+    "postflop": 36.8
+   },
+   "biggest_hand_level": {
+    "1": 34.4,
+    "2": 22.8,
+    "3": 17.4,
+    "4": 10.4,
+    "5": 7.2,
+    "6": 5.0,
+    "7": 2.0,
+    "8": 0.8
+   },
+   "draws_same_deciding_hand": 8.5,
+   "draws_same_hand_preflop_allin": 5.7,
+   "draws_both_decided_by_preflop_allin": 22.6
+  }
+ },
+ "_all": {
+  "label": "all of them together",
+  "matches": 500,
+  "pairs": 250,
+  "W": 131,
+  "D": 106,
+  "L": 13,
+  "biggest_hand_quartiles": [
+   10,
+   32,
+   62
+  ],
+  "match_length_quartiles": [
+   22,
+   43,
+   77
+  ],
+  "biggest_hand_kind": {
+   "no all-in": 31.2,
+   "preflop": 38.6,
+   "postflop": 30.2
+  },
+  "last_hand_kind": {
+   "preflop": 50.8,
+   "no all-in": 12.4,
+   "postflop": 36.8
+  },
+  "biggest_hand_level": {
+   "1": 34.4,
+   "2": 22.8,
+   "3": 17.4,
+   "4": 10.4,
+   "5": 7.2,
+   "6": 5.0,
+   "7": 2.0,
+   "8": 0.8
+  },
+  "draws_same_deciding_hand": 8.5,
+  "draws_same_hand_preflop_allin": 5.7,
+  "draws_both_decided_by_preflop_allin": 22.6
+ }
+}

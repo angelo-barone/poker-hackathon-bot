@@ -653,6 +653,57 @@ def decide(s):
     return normal_pre(s) if pre_flop else normal_post(s)
 ''')
 
+BOTS["whitebox"] = ('An attacker written from the audit of our own bot: its three most exploitable habits.',
+                    NORMAL + '''
+SHOVED = {"count": 0}
+
+
+def big_raise(s):
+    """A raise to 35-45% of the opponent's stack that is not all-in, or None if that is impossible."""
+    me = s["your_bot_id"]
+    opp = next(q for q in s["players"] if q["bot_id"] != me)
+    target = int(random.uniform(0.35, 0.45) * (opp["stack"] + opp["bet_this_street"]))
+    top = s["your_stack"] + s["your_bet_this_street"] - s["blinds"]["bb"]
+    amount = min(target, top)
+    return {"action": "raise", "amount": amount} if amount >= s["min_raise_to"] else None
+
+
+def decide(s):
+    if s.get("type") == "warmup":
+        return {"action": "check"}
+    me = s["your_bot_id"]
+    owed, pot, bb = s["amount_owed"], s["pot"], s["blinds"]["bb"]
+    if s["street"] == "preflop":
+        p = pre(s["your_cards"])
+        they_raised = any(a["bot_id"] != me and a["action"] in ("raise", "all_in") for a in s["action_log"])
+        if any(q["is_all_in"] for q in s["players"]) or (my_raises(s) >= 1 and they_raised):
+            return {"action": "call"} if p >= 0.76 else passive(s)      # they shoved back: fold most
+        if they_raised:                                     # they opened
+            if SHOVED["count"] < 4:                         # habit 3: shove over their first four opens
+                SHOVED["count"] += 1
+                return {"action": "all_in"}
+            if p >= 0.55:                                   # habit 1: a huge re-raise that is not all-in
+                return big_raise(s) or {"action": "all_in"}
+            return {"action": "call"} if p >= 0.40 and owed <= 4 * bb else {"action": "fold"}
+        if owed > 0:                                        # small blind, first in: habit 1 as an open
+            if p >= 0.42:
+                return big_raise(s) or {"action": "all_in"}
+            return {"action": "fold"}
+        return {"action": "check"}
+    m = made(s)
+    last_theirs = None
+    for a in s["action_log"]:
+        if a["bot_id"] != me and a["street"] != "preflop" and a["action"] in ("check", "call", "raise", "all_in"):
+            last_theirs = a["action"]
+    if s["can_check"]:
+        if last_theirs == "check":                          # habit 2: overbet whenever they check
+            return bet(s, random.uniform(1.1, 1.3))
+        return bet(s, 0.66) if m >= 1 else {"action": "check"}
+    if m >= 2:
+        return bet(s, 1.0)
+    return {"action": "call"} if m == 1 and owed <= pot - owed else {"action": "fold"}
+''')
+
 BOTS["switcher"] = ('Plays tight for 15 hands, then turns very aggressive (a fake early style).', NORMAL + '''
 
 def decide(s):

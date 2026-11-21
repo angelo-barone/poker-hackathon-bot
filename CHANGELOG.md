@@ -99,3 +99,19 @@ Two bug fixes from the fresh-eyes audit, no other change.
 
 Verdict, 9,350 pairs on the same seeds: v4 0.8008 -> v5a 0.8029 points per pairing; no matchup moved
 beyond noise (largest: earlyshover +4.7, oddsizer -3.7). 0 crashes, 0 timeouts, 0 corrected actions.
+
+## Final entry: v5a (Nov 21, 17:03)
+
+Versions tried after v5a, all rejected by same-seed verdicts:
+
+| Version | What it added to v5a | Points per pairing | Why rejected |
+|---|---|---|---|
+| v5b | forgetting counters, big-raise counting, overbet defence floor, traps in position | 0.8029 -> 0.7956 | valueshover -5.2, gto_charts -4.9, smallbet_trap -2.7, all beyond noise |
+| v5d | forgetting counters only | 0.8029 -> 0.7976 | earlyshover -7.3 beyond noise; switcher only +1.3 |
+| v5c | big-raise counting only | 0.8038 -> 0.8025 | no target improved; overall not up |
+| v5y | floor on how far early shoves cut our opens | whitebox 73.6% -> 73.4% | whitebox did not improve |
+| v5x | traps in position, overbets after our checks counted separately | whitebox 73.6% -> 74.4% | whitebox did not improve clearly |
+
+`sparring/whitebox` attacks the three habits from the audit; the entry beats it 73.6% (250 pairs).
+Final checks on the entry: validator passed; 6 matches in the Docker sandbox, 828 decisions, data_ok
+true on every one, none without debug data, 0 errors, 0 timeouts, slowest 40 ms.
