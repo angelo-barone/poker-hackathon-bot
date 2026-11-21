@@ -653,6 +653,25 @@ def decide(s):
     return normal_pre(s) if pre_flop else normal_post(s)
 ''')
 
+BOTS["switcher"] = ('Plays tight for 15 hands, then turns very aggressive (a fake early style).', NORMAL + '''
+
+def decide(s):
+    if s.get("type") == "warmup":
+        return {"action": "check"}
+    if s["hand_num"] < 15:                                  # the tight act
+        if s["street"] == "preflop":
+            if pre(s["your_cards"]) >= 0.76:
+                return {"action": "raise", "amount": max(s["min_raise_to"], 3 * s["current_bet"])}
+            return passive(s)
+        return normal_post(s) if tpgk(s) else passive(s)
+    r = random.random()                                     # then the real style
+    if r < 0.70:
+        return bet(s, random.uniform(0.75, 1.5))
+    if r < 0.95:
+        return cc(s)
+    return passive(s)
+''')
+
 BOTS["smallbet_trap"] = ('Bets a third of the pot on every street, shoves only with two pair or better.', '''
 def decide(s):
     if s.get("type") == "warmup":

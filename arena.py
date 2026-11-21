@@ -41,7 +41,7 @@ os.environ.setdefault("BOT_ENV_ALLOW", "SYSTEMROOT,SystemRoot,WINDIR,windir,TEMP
 from pokercore import structures                      # noqa: E402
 from pokercore.seats import BotSeat, Seat             # noqa: E402
 from pokercore.seeds import derive_seed               # noqa: E402
-from pokercore.table import MatchConfig, play_match   # noqa: E402
+from pokercore.table import MatchConfig, Table, play_match, warm_up   # noqa: E402
 
 VALID = ("fold", "check", "call", "raise", "all_in")
 
@@ -277,8 +277,40 @@ class Audit:
             self.out.close()
 
 
-def play_one(bot_a, bot_b, seed, first, real, log_path=None, keep=False):
-    """One freezeout match. `first` (0/1) says which bot takes seat 0."""
+def _play_uneven(seats, names, stacks, structure, seed, audit):
+    """A freezeout from uneven starting stacks (stacks = chips for bot A, bot B).
+    play_match only starts everyone level, so this drives the organisers' Table
+    directly, the same way play_match does. pokercore itself is untouched."""
+    start = {names[0]: stacks[0], names[1]: stacks[1]}
+    table = Table(seats, {s.name: start[s.name] for s in seats}, structure, seed, audit, "arena")
+    hand, stopped = 0, None
+    try:
+        warm_up(seats)
+        while True:
+            if len(table.occupied()) < 2:
+                stopped = "one_player_left"
+                break
+            if hand >= 2000:
+                stopped = "hand_limit"
+                break
+            table.play_hand(hand)
+            hand += 1
+    finally:
+        for s in seats:
+            s.stop()
+    results = []
+    for s in seats:
+        info = s.summary()
+        chips = table.stacks[s.name]
+        results.append({"bot": s.name, "place": 1 if chips > 0 else 2, "final_stack": chips,
+                        "timeouts": info.get("timeouts"), "restarts": info.get("restarts")})
+    return {"results": results, "hands": hand, "stopped": stopped}
+
+
+def play_one(bot_a, bot_b, seed, first, real, log_path=None, keep=False, cfg=None):
+    """One freezeout match. `first` (0/1) says which bot takes seat 0.
+    cfg (optional) changes the conditions: {"stack": chips each, "blinds":
+    "turbo" | "standard" | "slow" | "SB/BB[/ANTE]", "stacks": (chips A, chips B)}."""
     paths = [bot_a, bot_b]
     names = ["A:" + _bot_name(bot_a), "B:" + _bot_name(bot_b)]
     order = [0, 1] if first == 0 else [1, 0]
@@ -290,11 +322,16 @@ def play_one(bot_a, bot_b, seed, first, real, log_path=None, keep=False):
             seats.append(BotSeat(spec, seed=bot_seed, use_docker=False))
         else:
             seats.append(LocalSeat(names[k], paths[k], bot_seed))
-    config = MatchConfig(mode="freezeout", hands=2000, starting_stack=10_000,
-                         structure=structures.parse("standard", 10_000), seed=seed)
+    cfg = cfg or {}
+    structure = structures.parse(cfg.get("blinds", "standard"), 10_000)
     audit = Audit(log_path, keep)
     try:
-        result = play_match(seats, config, "arena", audit)
+        if cfg.get("stacks"):
+            result = _play_uneven(seats, names, cfg["stacks"], structure, seed, audit)
+        else:
+            config = MatchConfig(mode="freezeout", hands=2000, starting_stack=cfg.get("stack", 10_000),
+                                 structure=structure, seed=seed)
+            result = play_match(seats, config, "arena", audit)
     finally:
         audit.close()
     winner = None
@@ -323,9 +360,11 @@ def play_one(bot_a, bot_b, seed, first, real, log_path=None, keep=False):
 
 
 def play_pair(args):
-    bot_a, bot_b, seed, real = args
+    bot_a, bot_b, seed, real = args[:4]
+    cfg = args[4] if len(args) > 4 else None
     try:
-        return bot_b, seed, [play_one(bot_a, bot_b, seed, 0, real), play_one(bot_a, bot_b, seed, 1, real)]
+        return bot_b, seed, [play_one(bot_a, bot_b, seed, 0, real, cfg=cfg),
+                             play_one(bot_a, bot_b, seed, 1, real, cfg=cfg)]
     except Exception:
         return bot_b, seed, {"crash": traceback.format_exc()[-1500:]}
 

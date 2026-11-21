@@ -1,5 +1,5 @@
 """
-Team im_just_in_mech_eng (bot version v3): heads-up No-Limit Hold'em tournament bot.
+Team im_just_in_mech_eng (bot version v4): heads-up No-Limit Hold'em tournament bot.
 
 How it works, in plain words:
 
@@ -34,6 +34,11 @@ How it works, in plain words:
      player who bets whenever checked to; and we sometimes raise as a bluff
      against a player who bets almost every time. All three rates follow the
      counters: more against players who fold, none against players who call.
+  8. THE WHOLE MATCH (_life_premium). Calling an all-in can end our match, so
+     while the blinds are small we ask for more than the price alone: waiting
+     for a better spot costs almost nothing. The extra amount comes from an
+     exact solution of "opponent shoves every hand" and shrinks to zero as the
+     blinds rise. It is scaled down against opponents who rarely shove.
 
 Only eval7.Card and eval7.evaluate are used from eval7.
 """
@@ -50,12 +55,17 @@ import eval7
 # ── limits ───────────────────────────────────────────────────────────────────
 THINK_S = 0.170          # Monte Carlo stops here, so decide() returns before 200 ms
 MAX_ITERS = 1500         # enough for about +/-1.3% on equity
-PUSH_FOLD_BB = 12.0      # at or below this stack (in big blinds): all-in or fold
+PUSH_FOLD_BB = 15.0      # at or below this stack (in big blinds): all-in or fold
 BIG_BET = 1.05           # a bet above this share of the pot is an overbet
 LOOSE_MIN = 0.08         # the narrowest range we ever assign to a bet
 MAX_K = 12               # ... which is "the best of 12 random hands"
 DEFAULT_DEFENCE = 1.0    # 1.0 = defend at the minimum defence frequency before evidence
 COMMIT_PREMIUM = 0.08    # most extra equity asked for when risking a deep stack
+# Extra equity to call an all-in against a player who shoves every hand, by how
+# many big blinds are in play (both stacks together), at even stacks. From the
+# exact solve in tools/allin_ceiling.py: 400 bb in play = blinds 25/50.
+LIFE_PREMIUM = [(20, 0.0), (25, 0.012), (33, 0.036), (50, 0.068), (67, 0.096), (100, 0.122),
+                (133, 0.144), (200, 0.167), (400, 0.221)]
 
 RANKS = "AKQJT98765432"
 SUITS = "shdc"
@@ -175,6 +185,7 @@ def _push_fraction(eff_bb, ante):
 
 STATS = {
     "open_n": 0, "open_shove": 0, "open_raise": 0, "open_limp": 0, "open_fold": 0,
+    "sopen_n": 0, "sopen_shove": 0,                         # the same, only at 25 big blinds or less
     "limp_n": 0, "limp_shove": 0, "limp_raise": 0,          # opponent in the BB after we limp
     "raise_n": 0, "raise_shove": 0, "raise_3bet": 0, "raise_fold": 0, "raise_call": 0,
     "shove_n": 0, "shove_call": 0,                          # opponent facing our preflop all-in
@@ -196,6 +207,7 @@ STATS = {
 }
 _DONE_HANDS = set()
 _BOARDS = {}                     # hand number -> the board as we last saw it
+_DEPTH = {}                      # hand number -> effective stack in big blinds when we first acted
 
 
 def _rate(hits, n, prior, strength):
@@ -291,6 +303,14 @@ def _digest(entries, me, hand_num=None):
         if sb_id != me and first.get("bot_id") != me:
             s["open_n"] += 1
             a = first["action"]
+            depth = None                                    # hands we never acted in: use the hand before
+            for back in range(0, 4):
+                if hand_num is not None and (hand_num - back) in _DEPTH:
+                    depth = _DEPTH[hand_num - back]
+                    break
+            if depth is not None and depth <= 25:
+                s["sopen_n"] += 1
+                s["sopen_shove"] += a == "all_in"
             if a == "all_in":
                 s["open_shove"] += 1
             elif a == "raise":
@@ -450,6 +470,7 @@ def _context(s):
         "stack": s["your_stack"], "my_bet": s["your_bet_this_street"],
         "owed": s["amount_owed"], "pot": s["pot"],
         "eff": min(my_total, opp_total),             # most either player can lose from here
+        "in_play": s["your_stack"] + opp["stack"] + s["pot"],        # every chip on the table
         "opp_all_in": bool(opp.get("is_all_in")) or opp["stack"] <= 0,
     }
 
@@ -464,6 +485,48 @@ def _showdown_odds(c):
 
 
 # ── preflop ──────────────────────────────────────────────────────────────────
+
+def _call_fraction(eff_bb, ante):
+    """Share of hands the equilibrium big blind calls a shove with at this depth."""
+    return sum(COMBOS[i] for i in range(169) if _pushfold("call", i, eff_bb, ante)) / 1326.0
+
+
+def _life_premium(c, shove_rate):
+    """Extra equity we ask for before calling an all-in, on top of the price.
+
+    While the blinds are small, folding costs almost nothing and a better spot
+    will come, so a close gamble for the whole match is a bad trade. The amount
+    is read from LIFE_PREMIUM by how many big blinds are in play, reduced when
+    the stacks are uneven (less of the match is at stake) and scaled by how
+    often this opponent shoves: the table was solved for a player who shoves
+    every hand; someone who rarely does will not give us the next chance."""
+    in_play = c["in_play"] / float(c["bb"])
+    table = LIFE_PREMIUM
+    if in_play <= table[0][0]:
+        base = 0.0
+    elif in_play >= table[-1][0]:
+        base = table[-1][1]
+    else:
+        base = 0.0
+        for (x0, y0), (x1, y1) in zip(table, table[1:]):
+            if x0 <= in_play <= x1:
+                base = y0 + (y1 - y0) * (in_play - x0) / float(x1 - x0)
+                break
+    share = (c["stack"] + c["my_bet"]) / float(max(1, c["in_play"]))
+    uneven = 1.0 - 0.7 * min(1.0, abs(share - 0.5) / 0.5)
+    often = min(1.0, max(0.25, shove_rate / 0.60))
+    return base * uneven * often
+
+
+def _shove_pays(i, eff_bb, ante_bb, call_rate):
+    """Is an open shove worth more than folding the small blind, if they call
+    with the top call_rate of hands? All amounts in big blinds."""
+    call_rate = max(0.02, min(1.0, call_rate))
+    eq = _eq_vs_top(i, call_rate)
+    called = eq * (2 * eff_bb + 2 * ante_bb) - (eff_bb + ante_bb)
+    ev = (1.0 - call_rate) * (1.0 + ante_bb) + call_rate * called
+    return ev > -(0.5 + ante_bb) + 0.05
+
 
 def _preflop(s, c):
     i = _hand_class(s["your_cards"][0], s["your_cards"][1])
@@ -480,12 +543,26 @@ def _preflop(s, c):
     all_shoves = st["open_shove"] + st["limp_shove"] + st["raise_shove"]
     all_spots = st["open_n"] + st["limp_n"] + st["raise_n"]
     shove_overall = _rate(all_shoves, all_spots, 0.06, 4)
+    premium = _life_premium(c, shove_overall)
 
     # 1) Facing an all-in, or a raise so big that continuing commits our stack.
     if owed > 0 and (c["opp_all_in"] or owed >= 0.35 * c["stack"]):
-        if not mine and not i_am_sb:                         # they open-shoved
-            prior = _push_fraction(eff_bb, ante) if eff_bb <= 20 else 0.06
-            x = _rate(st["open_shove"], st["open_n"], prior, 4)
+        go = {"action": "call"} if c["opp_all_in"] else {"action": "all_in"}
+        odds = _showdown_odds(c)
+        if not mine and not i_am_sb and eff_bb <= 25:        # an open shove from a short stack
+            # Start from the equilibrium calling table. Leave it only when this
+            # opponent's shoving is clearly wider or tighter than equilibrium.
+            depth = min(eff_bb, 20.0)
+            usual = _push_fraction(depth, ante)
+            x = _rate(st["sopen_shove"], st["sopen_n"], usual, 4)
+            dbg.update(spot="vs_short_shove", range=round(x, 2), usual=round(usual, 2))
+            if abs(x - usual) < 0.15:
+                return (go if _pushfold("call", i, depth, ante) else {"action": "fold"}), dbg
+            eq = _eq_vs_top(i, x)
+            dbg.update(eq=round(eq, 3), need=round(odds + premium, 3))
+            return (go if eq >= odds + premium else {"action": "fold"}), dbg
+        if not mine and not i_am_sb:                         # an open shove from a deep stack
+            x = _rate(st["open_shove"] - st["sopen_shove"], st["open_n"] - st["sopen_n"], 0.06, 4)
         elif mine == ["call"]:                               # they shoved over our limp
             x = _rate(st["limp_shove"], st["limp_n"], 0.35 if eff_bb <= 12 else 0.08, 4)
         elif mine == ["raise"]:                              # they shoved over our raise
@@ -494,12 +571,10 @@ def _preflop(s, c):
         else:                                                # later in a raising war
             x = 0.10 if eff_bb <= 20 else 0.04
         x = max(x, 0.85 * shove_overall)
-        need = _showdown_odds(c) + 0.05 * min(1.0, max(0.0, (eff_bb - 10) / 40.0))
+        need = odds + premium
         eq = _eq_vs_top(i, x)
         dbg.update(spot="vs_shove", range=round(x, 2), eq=round(eq, 3), need=round(need, 3))
-        if eq >= need:
-            return ({"action": "call"} if c["opp_all_in"] else {"action": "all_in"}), dbg
-        return {"action": "fold"}, dbg
+        return (go if eq >= need else {"action": "fold"}), dbg
 
     # 2) We are the small blind and first to act.
     if i_am_sb and not mine and not theirs:
@@ -508,15 +583,21 @@ def _preflop(s, c):
             dbg.update(spot="push_fold")
             if _pushfold("push", i, eff_bb, ante):
                 return {"action": "all_in"}, dbg
+            # Wider than equilibrium only against a player who folds to our
+            # shoves more than equilibrium says they should.
+            calls = _rate(st["shove_call"], st["shove_n"], _call_fraction(eff_bb, ante), 4)
+            if _shove_pays(i, eff_bb, ante / float(bb), calls):
+                dbg.update(spot="push_wide", calls=round(calls, 2))
+                return {"action": "all_in"}, dbg
             return {"action": "fold"}, dbg
         if jam_back > 0.5:                 # they shove over everything: enter only with hands that call
             eq = _eq_vs_top(i, max(jam_back, 0.85 * shove_overall))
-            dbg.update(spot="vs_jammer", eq=round(eq, 3))
-            if eq >= 0.5 + 0.05 * min(1.0, max(0.0, (eff_bb - 10) / 40.0)):
+            dbg.update(spot="vs_jammer", eq=round(eq, 3), need=round(0.5 + premium, 3))
+            if eq >= 0.5 + premium:
                 return {"action": "raise", "amount": 2 * bb}, dbg
             return {"action": "fold"}, dbg
         fold_to_open = _rate(st["raise_fold"], st["raise_n"], 0.40, 6)
-        open_share = 1.0 if fold_to_open > 0.60 else 0.80
+        open_share = 1.0 if fold_to_open > 0.50 else 0.80
         dbg.update(spot="open")
         if RANK_END[i] <= open_share:
             size = 2.5 if eff_bb >= 25 else (2.2 if eff_bb >= 18 else 2.0)
@@ -554,7 +635,7 @@ def _preflop(s, c):
 
     # 5) We opened and they re-raised.
     if mine == ["raise"]:
-        x = max(0.03, _rate(st["raise_3bet"] + st["raise_shove"], st["raise_n"], 0.12, 6))
+        x = max(0.03, _rate(st["raise_3bet"] + st["raise_shove"], st["raise_n"], 0.20, 6))
         eq = _eq_vs_top(i, x)
         dbg.update(spot="vs_3bet", range=round(x, 2), eq=round(eq, 3), odds=round(odds, 3))
         if eq >= 0.62:
@@ -651,7 +732,7 @@ def _read_bets(s, c):
             continue
         was_aggressor = False
         if my_raise_seen:                                 # they re-raised us
-            f = _rate(st["raise_3bet"] + st["raise_shove"], st["raise_n"], 0.12, 6)
+            f = _rate(st["raise_3bet"] + st["raise_shove"], st["raise_n"], 0.20, 6)
         elif s["sb_seat"] != s["seat_to_act"]:            # they opened from the small blind
             f = _rate(st["open_raise"] + st["open_shove"], st["open_n"], 0.70, 6)
         else:
@@ -873,6 +954,8 @@ def _think(s, t0):
         pass                                            # counters are optional; decisions are not
     c = _context(s)
     _BOARDS[s["hand_num"]] = list(s["community_cards"])
+    if s["hand_num"] not in _DEPTH:
+        _DEPTH[s["hand_num"]] = c["eff"] / float(c["bb"])
     if s["street"] == "preflop":
         act, dbg = _preflop(s, c)
     else:

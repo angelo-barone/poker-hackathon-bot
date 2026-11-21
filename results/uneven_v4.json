@@ -1,0 +1,43 @@
+{
+ "textbook_tag": {
+  "behind": 0.375,
+  "ahead": 0.925,
+  "matches_each": 200,
+  "problems": 0
+ },
+ "lateshover": {
+  "behind": 0.405,
+  "ahead": 0.885,
+  "matches_each": 200,
+  "problems": 0
+ },
+ "threebettor": {
+  "behind": 0.33,
+  "ahead": 0.92,
+  "matches_each": 200,
+  "problems": 0
+ },
+ "adaptive": {
+  "behind": 0.37,
+  "ahead": 0.95,
+  "matches_each": 200,
+  "problems": 0
+ },
+ "classifier": {
+  "behind": 0.455,
+  "ahead": 0.935,
+  "matches_each": 200,
+  "problems": 0
+ },
+ "chartbot": {
+  "behind": 0.415,
+  "ahead": 0.96,
+  "matches_each": 200,
+  "problems": 0
+ },
+ "_all": {
+  "behind": 0.39166666666666666,
+  "ahead": 0.9291666666666667,
+  "matches_each": 1200
+ }
+}

@@ -64,3 +64,27 @@ Nine matchups rose beyond noise, none fell beyond noise (largest drop: random -4
 Reliability: 0 crashes, 0 timeouts, 0 corrected actions over 1,713,390 decisions. Slowest 80 ms.
 Passed the standing rule. A first try with smaller bets scored 0.779 and lost 7 points to random and
 6.4 to lateshover; bigger sizes against players who rarely fold fixed that.
+
+## v4 promoted to the entry (Nov 21, 14:47)
+
+What changed: preflop and short stacks. All-in-or-fold now starts at 15 big blinds (was 12). Facing an
+open shove at 25 big blinds or less, the bot calls by the equilibrium table unless that opponent shoves
+clearly more or less often than equilibrium. It shoves wider against players who fold to shoves more
+than they should. Calling an all-in while the blinds are small needs extra equity, taken from the exact
+all-in solve and scaled by how often the opponent shoves. Open-everything threshold 0.60 -> 0.50;
+re-raise starting guess 12% -> 20%.
+
+| Test (tiered allocation, same seeds) | v3 | v4 |
+|---|---|---|
+| Full field, 35 opponents: points per pairing | 0.7914 | 0.7965 |
+| jam20 (1,000 pairs) | 59.7% | 63.0% |
+| lateshover (1,000 pairs) | 67.5% | 70.8% |
+| allin / gto_charts / stealer / threebettor (1,000 pairs each) | 65.2 / 57.9 / 71.4 / 69.3 | 66.2 / 59.2 / 72.1 / 68.8 |
+| nashpush (250 pairs) | 88.6% | 86.2% |
+| v4 against v3 head to head (300 pairs) | - | 51.0% |
+| Behind/ahead test: from 4,000 / from 16,000 chips | 35.4% / 92.6% | 39.2% / 92.9% |
+
+Two targets rose beyond noise, four did not move, nothing fell beyond noise. Reliability: 0 crashes,
+0 timeouts, 0 corrected actions over 2,502,544 decisions; stress screen clean.
+Cutoff test at 150 pairs on ten opponents: 12 -> 0.697, 15 -> 0.701, 20 -> 0.698 (20 cost 4 points
+against nashpush).
