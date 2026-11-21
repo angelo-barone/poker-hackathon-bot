@@ -1,0 +1,455 @@
+{
+ "london_lucashsu": {
+  "hands": 43031,
+  "chips": 3840000,
+  "bbs": 24232.962749999984,
+  "paths": {
+   "SB: we open, they fold": [
+    12666,
+    0,
+    0,
+    1716690,
+    12691.500000000005
+   ],
+   "BB: we face a raise": [
+    14867,
+    14867,
+    2588,
+    939684,
+    6910.045000000001
+   ],
+   "SB: we open, they re-raise": [
+    597,
+    597,
+    560,
+    -208227,
+    -1563.6766666666674
+   ],
+   "SB: we fold": [
+    1184,
+    0,
+    0,
+    -93450,
+    -601.5000000000001
+   ],
+   "BB: they fold": [
+    5013,
+    0,
+    0,
+    644210,
+    2598.000000000001
+   ],
+   "SB: we open, they call": [
+    4017,
+    0,
+    0,
+    413654,
+    3061.384166666667
+   ],
+   "BB: we face a shove": [
+    1524,
+    1524,
+    1076,
+    -241971,
+    -781.5254166666659
+   ],
+   "SB: we shove, they fold": [
+    2681,
+    0,
+    0,
+    941920,
+    2775.699999999999
+   ],
+   "BB: they limp": [
+    77,
+    0,
+    0,
+    -6228,
+    -3.271666666666665
+   ],
+   "SB: we limp": [
+    96,
+    0,
+    0,
+    -1565,
+    -6.361666666666668
+   ],
+   "blinds force an all-in": [
+    108,
+    0,
+    0,
+    -1077,
+    -2.0903333333333336
+   ],
+   "SB: we shove, they call": [
+    201,
+    0,
+    0,
+    -263640,
+    -845.240666666667
+   ]
+  },
+  "post": {
+   "they fold to our bet": [
+    8553,
+    3066850,
+    24289.546666666673
+   ],
+   "we fold to a bet": [
+    2671,
+    -1548365,
+    -13161.6975
+   ],
+   "checked down, win": [
+    824,
+    250135,
+    2059.4
+   ],
+   "they call our bet, win": [
+    506,
+    1519097,
+    13689.55416666666
+   ],
+   "we call their bet, tie": [
+    26,
+    0,
+    0.0
+   ],
+   "we call their bet, lose": [
+    209,
+    -613787,
+    -6660.129999999998
+   ],
+   "checked down, lose": [
+    1251,
+    -365890,
+    -3168.1999999999994
+   ],
+   "we call their bet, win": [
+    77,
+    293391,
+    2947.1124999999984
+   ],
+   "they call our bet, lose": [
+    748,
+    -1351732,
+    -10931.11333333333
+   ],
+   "they call our bet, tie": [
+    59,
+    0,
+    0.0
+   ],
+   "checked down, tie": [
+    123,
+    0,
+    0.0
+   ]
+  },
+  "allin": {
+   "preflop": [
+    807,
+    358.0,
+    -155242,
+    -320.8194166666666,
+    366.6666000000001
+   ],
+   "postflop": [
+    168,
+    92.0,
+    155952,
+    1139.3383333333334,
+    73.23470000000002
+   ]
+  },
+  "faced": [
+   4169,
+   2671
+  ],
+  "decided": {
+   "label": "london_lucashsu",
+   "matches": 500,
+   "pairs": 250,
+   "W": 193,
+   "D": 56,
+   "L": 1,
+   "biggest_hand_quartiles": [
+    35,
+    58,
+    83
+   ],
+   "match_length_quartiles": [
+    67,
+    89,
+    105
+   ],
+   "biggest_hand_kind": {
+    "no all-in": 48.4,
+    "preflop": 26.0,
+    "postflop": 25.6
+   },
+   "last_hand_kind": {
+    "preflop": 74.4,
+    "postflop": 16.6,
+    "no all-in": 9.0
+   },
+   "biggest_hand_level": {
+    "1": 9.4,
+    "2": 19.6,
+    "3": 23.8,
+    "4": 20.8,
+    "5": 15.4,
+    "6": 6.6,
+    "7": 4.0,
+    "8": 0.4
+   },
+   "draws_same_deciding_hand": 17.9,
+   "draws_same_hand_preflop_allin": 0.0,
+   "draws_both_decided_by_preflop_allin": 3.6
+  }
+ },
+ "london_bouillie": {
+  "hands": 46771,
+  "chips": 4620000,
+  "bbs": 28766.642249999994,
+  "paths": {
+   "SB: we open, they fold": [
+    12186,
+    0,
+    0,
+    1637630,
+    12198.500000000004
+   ],
+   "BB: they limp": [
+    1972,
+    0,
+    0,
+    115096,
+    832.7283333333335
+   ],
+   "BB: they fold": [
+    20480,
+    0,
+    0,
+    1721720,
+    10349.4
+   ],
+   "SB: we open, they re-raise": [
+    256,
+    256,
+    242,
+    -94471,
+    -702.3066666666668
+   ],
+   "SB: we fold": [
+    1574,
+    0,
+    0,
+    -127965,
+    -795.9000000000003
+   ],
+   "SB: we open, they call": [
+    5739,
+    0,
+    0,
+    510865,
+    4486.629166666665
+   ],
+   "BB: we face a raise": [
+    595,
+    595,
+    525,
+    -99135,
+    -590.3616666666669
+   ],
+   "SB: we shove, they fold": [
+    3124,
+    0,
+    0,
+    1025480,
+    3204.3999999999987
+   ],
+   "SB: we limp": [
+    199,
+    0,
+    0,
+    -1118,
+    0.7362499999999992
+   ],
+   "blinds force an all-in": [
+    579,
+    0,
+    0,
+    3194,
+    9.580166666666663
+   ],
+   "SB: we shove, they call": [
+    43,
+    0,
+    0,
+    -65433,
+    -207.6375
+   ],
+   "BB: we face a shove": [
+    24,
+    18,
+    7,
+    -5863,
+    -19.125833333333336
+   ]
+  },
+  "post": {
+   "checked down, win": [
+    30,
+    7230,
+    51.9
+   ],
+   "we fold to a bet": [
+    2557,
+    -1385533,
+    -11202.399166666672
+   ],
+   "they fold to our bet": [
+    4154,
+    1675190,
+    13273.93416666667
+   ],
+   "they call our bet, win": [
+    70,
+    278751,
+    2606.940000000001
+   ],
+   "they call our bet, tie": [
+    8,
+    0,
+    0.0
+   ],
+   "we call their bet, lose": [
+    138,
+    -561079,
+    -4244.948333333333
+   ],
+   "checked down, lose": [
+    52,
+    -11145,
+    -66.4
+   ],
+   "we call their bet, tie": [
+    18,
+    0,
+    0.0
+   ],
+   "we call their bet, win": [
+    150,
+    567183,
+    4569.490833333335
+   ],
+   "they call our bet, lose": [
+    37,
+    -54211,
+    -353.92166666666674
+   ]
+  },
+  "allin": {
+   "preflop": [
+    251,
+    109.0,
+    -80600,
+    -286.93375000000015,
+    109.45250000000003
+   ],
+   "postflop": [
+    155,
+    88.0,
+    162952,
+    2068.8725000000004,
+    64.92470000000002
+   ]
+  },
+  "faced": [
+   4561,
+   2557
+  ],
+  "decided": {
+   "label": "london_bouillie",
+   "matches": 500,
+   "pairs": 250,
+   "W": 232,
+   "D": 17,
+   "L": 1,
+   "biggest_hand_quartiles": [
+    40,
+    56,
+    71
+   ],
+   "match_length_quartiles": [
+    86,
+    98,
+    108
+   ],
+   "biggest_hand_kind": {
+    "no all-in": 68.8,
+    "postflop": 26.2,
+    "preflop": 5.0
+   },
+   "last_hand_kind": {
+    "preflop": 22.2,
+    "no all-in": 58.6,
+    "postflop": 19.2
+   },
+   "biggest_hand_level": {
+    "1": 8.8,
+    "2": 16.4,
+    "3": 31.0,
+    "4": 32.0,
+    "5": 9.8,
+    "6": 1.8,
+    "7": 0.2
+   },
+   "draws_same_deciding_hand": 11.8,
+   "draws_same_hand_preflop_allin": 5.9,
+   "draws_both_decided_by_preflop_allin": 5.9
+  }
+ },
+ "_all": {
+  "label": "all of them together",
+  "matches": 1000,
+  "pairs": 500,
+  "W": 425,
+  "D": 73,
+  "L": 2,
+  "biggest_hand_quartiles": [
+   38,
+   57,
+   75
+  ],
+  "match_length_quartiles": [
+   74,
+   94,
+   107
+  ],
+  "biggest_hand_kind": {
+   "no all-in": 58.6,
+   "preflop": 15.5,
+   "postflop": 25.9
+  },
+  "last_hand_kind": {
+   "preflop": 48.3,
+   "postflop": 17.9,
+   "no all-in": 33.8
+  },
+  "biggest_hand_level": {
+   "1": 9.1,
+   "2": 18.0,
+   "3": 27.4,
+   "4": 26.4,
+   "5": 12.6,
+   "6": 4.2,
+   "7": 2.1,
+   "8": 0.2
+  },
+  "draws_same_deciding_hand": 16.4,
+  "draws_same_hand_preflop_allin": 1.4,
+  "draws_both_decided_by_preflop_allin": 4.1
+ }
+}

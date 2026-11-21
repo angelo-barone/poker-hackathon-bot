@@ -115,3 +115,14 @@ Versions tried after v5a, all rejected by same-seed verdicts:
 `sparring/whitebox` attacks the three habits from the audit; the entry beats it 73.6% (250 pairs).
 Final checks on the entry: validator passed; 6 matches in the Docker sandbox, 828 decisions, data_ok
 true on every one, none without debug data, 0 errors, 0 timeouts, slowest 40 ms.
+
+## Last stretch (Nov 21, 17:10 to 17:35): v5a confirmed as the final entry
+
+- Tag `safe-v5a` marks the submitted version.
+- A second fresh safety audit of v5a found 0 bugs reachable under the README's rules (14,000 fuzzed
+  states: no exception, no illegal action; worst decision 45 ms).
+- Two bots from the Fullhouse Hackathon 2026 in London were added as sparring opponents. The entry wins
+  88.4% of matches against `london_lucashsu` (MIT, committed with its notice) and 96.2% against a second
+  bot that has no licence and is therefore kept local and not in this repository.
+- v5e (bet size chosen by one-step expected value once a size has 6 observations) was rejected:
+  0.8029 -> 0.7766 points per pairing, seven matchups down beyond noise, mc_exploiter +4.2 inside noise.
