@@ -41,7 +41,7 @@ def field():
     return bots
 
 
-def allocate(opponents, ref_tag, targets):
+def allocate(opponents, ref_tag, targets, tiers=(50, 250, 500, 1000)):
     """Pairs per opponent, from an earlier result file (see the module docstring)."""
     ref_rows = json.load(open(ROOT / "results" / f"screen_{ref_tag}.json"))["screen"]["rows"]
     ref = {r["name"]: r["match_win_rate"] for r in ref_rows}
@@ -51,13 +51,13 @@ def allocate(opponents, ref_tag, targets):
     plan = {}
     for o, n in names.items():
         if n in deep:
-            plan[o] = 1000
+            plan[o] = tiers[3]
         elif n in hardest:
-            plan[o] = 500
+            plan[o] = tiers[2]
         elif ref.get(n, 0.0) >= 0.90:
-            plan[o] = 50
+            plan[o] = tiers[0]
         else:
-            plan[o] = 250
+            plan[o] = tiers[1]
     return plan
 
 
@@ -126,6 +126,8 @@ def main():
     ap.add_argument("--pairs", type=int, default=100, help="pairs vs every opponent (without --alloc)")
     ap.add_argument("--alloc", metavar="REF", help="tiered allocation from results/screen_REF.json")
     ap.add_argument("--targets", default="", help="with --alloc: comma-separated bots that get 1,000 pairs")
+    ap.add_argument("--tiers", default="50,250,500,1000",
+                    help="with --alloc: pairs for easy (90%%+), middle, six hardest, targets")
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--only", help="comma-separated opponent names")
@@ -139,7 +141,8 @@ def main():
         opponents = [o for o in opponents if Path(o).name in want]
     tag = args.tag or Path(args.bot).name
     if args.alloc:
-        plan = allocate(opponents, args.alloc, [t for t in args.targets.split(",") if t])
+        plan = allocate(opponents, args.alloc, [t for t in args.targets.split(",") if t],
+                        tuple(int(x) for x in args.tiers.split(",")))
         how = f"tiered allocation from '{args.alloc}', {sum(plan.values()):,} pairs in total"
     else:
         plan = {o: args.pairs for o in opponents}

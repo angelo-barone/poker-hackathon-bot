@@ -88,3 +88,14 @@ Two targets rose beyond noise, four did not move, nothing fell beyond noise. Rel
 0 timeouts, 0 corrected actions over 2,502,544 decisions; stress screen clean.
 Cutoff test at 150 pairs on ten opponents: 12 -> 0.697, 15 -> 0.701, 20 -> 0.698 (20 cost 4 points
 against nashpush).
+
+## v5a promoted to the entry (Nov 21, 15:57)
+
+Two bug fixes from the fresh-eyes audit, no other change.
+- A1: with a tiny stack in the small blind, the plain big blind is no longer read as a shove; the
+  all-in-or-fold table is used. (1.7 big blinds behind: v4 played 18% of hands, v5a plays 100%.)
+- A2: when a bigger stack bets more than we have, odds and bet-size reads use the pot we can actually
+  win. (4,000 chips facing a 16,000 open shove: v4 called with 82% of hands, v5a with 2%.)
+
+Verdict, 9,350 pairs on the same seeds: v4 0.8008 -> v5a 0.8029 points per pairing; no matchup moved
+beyond noise (largest: earlyshover +4.7, oddsizer -3.7). 0 crashes, 0 timeouts, 0 corrected actions.

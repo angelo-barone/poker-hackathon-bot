@@ -1,5 +1,5 @@
 """
-Team im_just_in_mech_eng (bot version v4): heads-up No-Limit Hold'em tournament bot.
+Team im_just_in_mech_eng (bot version v5a): heads-up No-Limit Hold'em tournament bot.
 
 How it works, in plain words:
 
@@ -465,10 +465,15 @@ def _context(s):
     bb = max(1, int(s["blinds"]["bb"]))
     my_total = s["your_stack"] + s["your_bet_this_street"]
     opp_total = opp["stack"] + opp["bet_this_street"]
+    # When a bigger stack bets more than everything we have, the extra chips are
+    # in `pot` but we can never win them, and we can never pay more than our
+    # stack. All odds and bet-size reads use the pot we can win and the price
+    # we can pay.
+    unmatched = max(0, opp["bet_this_street"] - my_total)
     return {
         "me": me, "opp_id": opp["bot_id"], "bb": bb, "ante": s["blinds"].get("ante", 0),
         "stack": s["your_stack"], "my_bet": s["your_bet_this_street"],
-        "owed": s["amount_owed"], "pot": s["pot"],
+        "owed": min(s["amount_owed"], s["your_stack"]), "pot": s["pot"] - unmatched,
         "eff": min(my_total, opp_total),             # most either player can lose from here
         "in_play": s["your_stack"] + opp["stack"] + s["pot"],        # every chip on the table
         "opp_all_in": bool(opp.get("is_all_in")) or opp["stack"] <= 0,
@@ -546,9 +551,17 @@ def _preflop(s, c):
     premium = _life_premium(c, shove_overall)
 
     # 1) Facing an all-in, or a raise so big that continuing commits our stack.
-    if owed > 0 and (c["opp_all_in"] or owed >= 0.35 * c["stack"]):
+    #    A blind is not a raise: with a tiny stack in the small blind the big
+    #    blind alone can be a large share of our chips, and that spot belongs to
+    #    the all-in-or-fold table below, not here.
+    raised = bool(theirs) and theirs[-1] in ("raise", "all_in")
+    if owed > 0 and (c["opp_all_in"] or (raised and owed >= 0.35 * c["stack"])):
         go = {"action": "call"} if c["opp_all_in"] else {"action": "all_in"}
         odds = _showdown_odds(c)
+        if not raised:                                       # their blind took their last chips:
+            eq = _eq_vs_top(i, 1.0)                          # they hold any two cards
+            dbg.update(spot="vs_blind_all_in", eq=round(eq, 3), need=round(odds, 3))
+            return (go if eq >= odds else {"action": "fold"}), dbg
         if not mine and not i_am_sb and eff_bb <= 25:        # an open shove from a short stack
             # Start from the equilibrium calling table. Leave it only when this
             # opponent's shoving is clearly wider or tighter than equilibrium.

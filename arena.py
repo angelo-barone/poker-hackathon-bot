@@ -191,7 +191,7 @@ class Audit:
         return self.per_bot.setdefault(name, {"decisions": 0, "errors": 0, "corrected": 0,
                                               "free_folds": 0, "data_bad": 0, "max_ms": 0.0, "sum_ms": 0.0,
                                               "hands": 0, "chips": 0, "adj_chips": 0.0, "adj_bb": 0.0,
-                                              "allins_adjusted": 0})
+                                              "allins_adjusted": 0, "with_debug": 0, "no_debug": 0})
 
     def emit(self, event_type, **data):
         event = {"i": self.n, "type": event_type, **data}
@@ -229,6 +229,9 @@ class Audit:
             dbg = data.get("debug")
             if isinstance(dbg, dict) and dbg.get("data_ok") is False:
                 b["data_bad"] += 1
+            # A bot that normally reports debug data but sent none on this decision
+            # swallowed an exception and fell back to a check or fold.
+            b["with_debug" if isinstance(dbg, dict) else "no_debug"] += 1
             asked = str(reply.get("action") or "").lower().strip()
             problem = None
             if data.get("error"):
@@ -347,6 +350,7 @@ def play_one(bot_a, bot_b, seed, first, real, log_path=None, keep=False, cfg=Non
         "decisions": a.get("decisions", 0), "errors": a.get("errors", 0),
         "corrected": a.get("corrected", 0), "free_folds": a.get("free_folds", 0),
         "data_bad": a.get("data_bad", 0),
+        "with_debug": a.get("with_debug", 0), "no_debug": a.get("no_debug", 0),
         "chips": a.get("chips", 0), "adj_chips": a.get("adj_chips", 0.0), "adj_bb": a.get("adj_bb", 0.0),
         "allins_adjusted": a.get("allins_adjusted", 0),
         "short_hands": audit.depth["short"], "zone_hands": audit.depth["zone"],
@@ -434,6 +438,7 @@ def summarise(bot_a, bot_b, pair_results, mode, seconds=None):
         "corrected_actions": sum(m["corrected"] for m in matches),
         "free_folds": sum(m["free_folds"] for m in matches),
         "data_bad": sum(m["data_bad"] for m in matches),
+        "no_debug": (sum(m["no_debug"] for m in matches) if any(m["with_debug"] for m in matches) else 0),
         "hands": sum(m["hands"] for m in matches),
         "chips_per_100": round(100 * sum(m["chips"] for m in matches) / max(1, sum(m["hands"] for m in matches)), 1),
         "adj_chips_per_100": round(100 * sum(m["adj_chips"] for m in matches)
@@ -455,7 +460,7 @@ def summarise(bot_a, bot_b, pair_results, mode, seconds=None):
 def fail_loudly(summaries):
     """Stop with a non-zero exit if the bot ever played without its tables, or
     if the runner itself broke. A silent fallback would make every number a lie."""
-    bad = [s for s in summaries if s["data_bad"] or s["runner_crashes"]]
+    bad = [s for s in summaries if s["data_bad"] or s["runner_crashes"] or s.get("no_debug")]
     if not bad:
         return
     print("\n" + "!" * 78)
@@ -463,6 +468,9 @@ def fail_loudly(summaries):
         if s["data_bad"]:
             print(f"FATAL: data_ok was False on {s['data_bad']} decisions vs {s['name']}: "
                   "the bot's data tables did not load. Results are NOT valid.")
+        if s.get("no_debug"):
+            print(f"FATAL: {s['no_debug']} decisions vs {s['name']} carried no debug data: the bot hit an "
+                  "internal error and fell back to a check or fold. Results are NOT valid.")
         if s["runner_crashes"]:
             print(f"FATAL: the runner crashed on {s['runner_crashes']} pairs vs {s['name']}:")
             for tb in s["runner_crash_text"]:
