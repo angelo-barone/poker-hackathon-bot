@@ -129,8 +129,7 @@ def classify(h, me):
 
 
 def analyse_pair(args):
-    opp_path, seed = args
-    me_path = ENTRY
+    opp_path, seed, me_path = args
     out = {"paths": {}, "post": {}, "allin": {}, "faced": [0, 0], "hands": 0, "chips": 0, "bbs": 0.0,
            "matches": []}
     t = _eq_tables()
@@ -265,6 +264,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("opponents", help="comma-separated names in sparring/ (or bots/caller)")
     ap.add_argument("--pairs", type=int, default=250)
+    ap.add_argument("--bot", default=ENTRY, help="the bot to analyse (default: the entry)")
+    ap.add_argument("--out", default="leaks", help="results/<out>.json")
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     args = ap.parse_args()
@@ -272,7 +273,7 @@ def main():
     names = args.opponents.split(",")
     paths = {n: (os.path.join("bots", n) if n == "caller" else os.path.join("sparring", n)) for n in names}
     seeds = arena.pair_seeds(args.seed, args.pairs)
-    jobs = [(paths[n], s) for s in seeds for n in names]
+    jobs = [(paths[n], s, args.bot) for s in seeds for n in names]
     totals = {p: {"paths": {}, "post": {}, "allin": {}, "faced": [0, 0], "hands": 0, "chips": 0,
                   "bbs": 0.0, "pairs": []} for p in paths.values()}
     t0 = time.time()
@@ -288,7 +289,7 @@ def main():
         saved[n] = {"hands": t["hands"], "chips": t["chips"], "bbs": t["bbs"], "paths": t["paths"],
                     "post": t["post"], "allin": t["allin"], "faced": t["faced"], "decided": d}
     saved["_all"] = decided("all of them together", [p for n in names for p in totals[paths[n]]["pairs"]])
-    with open(os.path.join(ROOT, "results", "leaks.json"), "w") as f:
+    with open(os.path.join(ROOT, "results", args.out + ".json"), "w") as f:
         json.dump(saved, f, indent=1)
 
 

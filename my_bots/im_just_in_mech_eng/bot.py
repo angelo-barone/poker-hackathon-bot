@@ -1,5 +1,5 @@
 """
-Team im_just_in_mech_eng (bot version v1): heads-up No-Limit Hold'em tournament bot.
+Team im_just_in_mech_eng (bot version v2): heads-up No-Limit Hold'em tournament bot.
 
 How it works, in plain words:
 
@@ -11,16 +11,22 @@ How it works, in plain words:
      For all 169 starting hands we know how often each one beats each other
      one. From that we get the equity of our hand against "the top X% of
      hands", and the all-in-or-fold ranges for short stacks.
-  3. OPPONENT COUNTERS (_digest). We count how often the opponent shoves,
-     raises, folds to bets and bets after the flop, and blend those counts
-     with a cautious starting guess, so one or two hands never swing us.
-  4. POSTFLOP EQUITY (_equity). We deal the unknown cards many times and count
-     how often we win. If the opponent has been betting, we give them the best
-     of several random hands, because a betting hand is stronger than a random
-     one.
-  5. DECISION RULE. Compare equity to the price of continuing (pot odds):
+  3. OPPONENT COUNTERS (_digest, _replay). Every time the opponent could bet,
+     we count whether they did, and whether it was a normal bet or an overbet
+     or shove. Counts are blended with a starting guess, so one or two hands
+     never swing us.
+  4. READING BETS (_looseness, _read_bets). A bet tells us more the less often
+     that opponent makes it. Before we have evidence we assume a normal mix of
+     strong hands and bluffs and continue often enough that bluffing us does
+     not pay. Opponents who bet almost always get called by the price alone;
+     opponents who rarely bet, and rare big bets, get credit for strong hands.
+  5. POSTFLOP EQUITY (_equity). We deal the unknown cards many times and count
+     how often we win, giving the opponent the best of several random hands:
+     few when their betting says little, many when it says a lot.
+  6. DECISION RULE. Compare equity to the price of continuing (pot odds):
      fold when it is too expensive, call when it is fair, bet or raise when we
-     are well ahead.
+     are well ahead. Putting a deep stack in needs a stronger hand than the
+     price alone asks for.
 
 Only eval7.Card and eval7.evaluate are used from eval7.
 """
@@ -38,6 +44,11 @@ import eval7
 THINK_S = 0.170          # Monte Carlo stops here, so decide() returns before 200 ms
 MAX_ITERS = 1500         # enough for about +/-1.3% on equity
 PUSH_FOLD_BB = 12.0      # at or below this stack (in big blinds): all-in or fold
+BIG_BET = 1.05           # a bet above this share of the pot is an overbet
+LOOSE_MIN = 0.08         # the narrowest range we ever assign to a bet
+MAX_K = 12               # ... which is "the best of 12 random hands"
+DEFAULT_DEFENCE = 1.0    # 1.0 = defend at the minimum defence frequency before evidence
+COMMIT_PREMIUM = 0.08    # most extra equity asked for when risking a deep stack
 
 RANKS = "AKQJT98765432"
 SUITS = "shdc"
@@ -161,9 +172,18 @@ STATS = {
     "raise_n": 0, "raise_shove": 0, "raise_3bet": 0, "raise_fold": 0, "raise_call": 0,
     "shove_n": 0, "shove_call": 0,                          # opponent facing our preflop all-in
     "bet_faced_n": 0, "bet_fold": 0,                        # opponent facing our postflop bets
-    "post_n": 0, "post_aggr": 0,                            # opponent's postflop actions
+    # per opportunity, after the flop: could they bet / raise, and did they?
+    "fbet_n": 0, "fbet": 0,                                 # flop, nothing to call: normal bets
+    "lbet_n": 0, "lbet": 0,                                 # turn and river, nothing to call
+    "rz_n": 0, "rz": 0,                                     # facing our bet: normal raises
+    "big_n": 0, "big": 0,                                   # any spot: overbets and big shoves
+    "agg_n": 0, "agg": 0,                                   # every decision, any street: did they raise?
+    # bets that reached a showdown: how often was the hand behind them weak?
+    "shown_flop_n": 0, "shown_flop_weak": 0, "shown_late_n": 0, "shown_late_weak": 0,
+    "shown_big_n": 0, "shown_big_weak": 0,
 }
 _DONE_HANDS = set()
+_BOARDS = {}                     # hand number -> the board as we last saw it
 
 
 def _rate(hits, n, prior, strength):
@@ -171,7 +191,68 @@ def _rate(hits, n, prior, strength):
     return (hits + prior * strength) / (n + strength)
 
 
-def _digest(entries, me):
+def _replay(entries, me):
+    """Walk one hand's log entries and rebuild the pot, so that for each of the
+    opponent's postflop actions we know: were they facing a bet, did they bet
+    or raise, and how big was it compared with the pot."""
+    pot = 0
+    bets = {}
+    street = "preflop"
+    out = []
+    for e in entries:
+        act = e.get("action")
+        st = e.get("street")
+        if act == "show" or act is None:
+            continue
+        if st != street and st in ("flop", "turn", "river"):
+            street, bets = st, {}
+        who = e.get("bot_id")
+        amount = int(e.get("amount") or 0)
+        mine = bets.get(who, 0)
+        if act == "ante":
+            pot += amount
+            continue
+        if act in ("small_blind", "big_blind"):
+            bets[who] = mine + amount
+            pot += amount
+            continue
+        if act not in VOLUNTARY:
+            continue
+        top = max(bets.values()) if bets else 0
+        to_call = max(0, top - mine)
+        rec = {"street": street, "facing": to_call > 0, "kind": "none", "big": False,
+               "size": 0.0, "action": act}
+        if act == "call":
+            bets[who] = mine + amount
+            pot += amount
+        elif act in ("raise", "all_in"):
+            if amount > top:                              # a real bet or raise, not a call for less
+                size = (amount - top) / float(max(1, pot + to_call))
+                rec["kind"] = "raise" if to_call > 0 else "bet"
+                rec["size"] = size
+                rec["big"] = size > BIG_BET or (act == "all_in" and size > 0.75)
+            pot += max(0, amount - mine)
+            bets[who] = max(mine, amount)
+        if who != me and street != "preflop":
+            out.append(rec)
+    return out
+
+
+def _strength(cards, board):
+    """Share of all other hands that these two cards beat on a finished board."""
+    known = set(cards) | set(board)
+    deck = [CARD[c] for c in ALL_CARDS if c not in known]
+    brd = [CARD[c] for c in board]
+    mine = eval7.evaluate([CARD[c] for c in cards] + brd)
+    score = n = 0
+    for pair in itertools.combinations(deck, 2):
+        other = eval7.evaluate(list(pair) + brd)
+        score += 1.0 if mine > other else (0.5 if mine == other else 0.0)
+        n += 1
+    return score / n
+
+
+def _digest(entries, me, hand_num=None):
     """Update STATS from one finished hand's log entries."""
     sb_id = None
     for e in entries:
@@ -181,8 +262,11 @@ def _digest(entries, me):
         return
     acts = [e for e in entries if e.get("action") in VOLUNTARY]
     pre = [e for e in acts if e.get("street") == "preflop"]
-    post = [e for e in acts if e.get("street") in ("flop", "turn", "river")]
     s = STATS
+    for e in pre:
+        if e.get("bot_id") != me:
+            s["agg_n"] += 1
+            s["agg"] += e["action"] in ("raise", "all_in")
     if pre:
         first = pre[0]
         if sb_id != me and first.get("bot_id") != me:
@@ -218,20 +302,46 @@ def _digest(entries, me):
                 s["shove_n"] += 1
                 if theirs in ("call", "all_in"):
                     s["shove_call"] += 1
-    pending = None                       # our last postflop action, if it was a bet
-    for e in post:
-        a = e["action"]
-        if e.get("bot_id") == me:
-            pending = a if a in ("raise", "all_in") else None
-            continue
-        s["post_n"] += 1
-        if pending:
+    recs = _replay(entries, me)
+    for rec in recs:
+        s["agg_n"] += 1
+        s["agg"] += rec["kind"] != "none"
+        s["big_n"] += 1
+        if rec["big"]:
+            s["big"] += 1
+        if rec["facing"]:
+            s["rz_n"] += 1
             s["bet_faced_n"] += 1
-            if a == "fold":
+            if rec["action"] == "fold":
                 s["bet_fold"] += 1
-        if a == "raise" or (a == "all_in" and pending != "all_in"):
-            s["post_aggr"] += 1
-        pending = None
+            if rec["kind"] == "raise" and not rec["big"]:
+                s["rz"] += 1
+        else:
+            key = "fbet" if rec["street"] == "flop" else "lbet"
+            s[key + "_n"] += 1
+            if rec["kind"] == "bet" and not rec["big"]:
+                s[key] += 1
+    # Showdown evidence: if they bet and then showed a weak hand, their bets are
+    # not all strength; if they always show strong hands, their bets are honest.
+    shown = None
+    for e in entries:
+        if e.get("action") == "show" and e.get("bot_id") != me:
+            shown = e.get("cards")
+    board = _BOARDS.get(hand_num)
+    if shown and board and len(board) == 5:
+        bet_flop = any(r["kind"] != "none" and r["street"] == "flop" for r in recs)
+        bet_late = any(r["kind"] != "none" and r["street"] != "flop" for r in recs)
+        if bet_flop or bet_late:
+            weak = _strength(shown, board) < 0.40
+            if bet_flop:
+                s["shown_flop_n"] += 1
+                s["shown_flop_weak"] += weak
+            if bet_late:
+                s["shown_late_n"] += 1
+                s["shown_late_weak"] += weak
+            if any(r["big"] for r in recs):
+                s["shown_big_n"] += 1
+                s["shown_big_weak"] += weak
 
 
 def _update_stats(state):
@@ -248,13 +358,14 @@ def _update_stats(state):
         if entries[0].get("action") not in ("ante", "small_blind"):
             continue
         _DONE_HANDS.add(h)
-        _digest(entries, me)
+        _digest(entries, me, h)
 
 
 # ── postflop equity by simulation ────────────────────────────────────────────
 
 def _equity(hole, board, k, deadline, max_iters=MAX_ITERS):
     """Chance of winning at showdown against the best of k random hands.
+    k may be fractional: 1.4 means the best of 2 hands 40% of the time, else 1.
     hole/board are card strings. Returns (equity, samples)."""
     known = set(hole) | set(board)
     deck = [CARD[c] for c in ALL_CARDS if c not in known]
@@ -264,6 +375,8 @@ def _equity(hole, board, k, deadline, max_iters=MAX_ITERS):
     ev = eval7.evaluate
     score = 0.0
     n = 0
+    k_low = int(k)
+    k_extra = k - k_low
     if need == 0 and k == 1:                       # river vs a random hand: count exactly
         a = ev(mine + brd)
         for pair in itertools.combinations(deck, 2):
@@ -272,11 +385,13 @@ def _equity(hole, board, k, deadline, max_iters=MAX_ITERS):
             n += 1
         return score / n, n
     sample = random.sample
+    rnd = random.random
     clock = time.perf_counter
     fixed = mine + brd
     while n < max_iters:
         if n % 32 == 0 and n and clock() > deadline:
             break
+        k = k_low + (1 if k_extra and rnd() < k_extra else 0)
         s = sample(deck, 2 * k + need)
         opp = s[0:2]
         if k > 1:
@@ -438,36 +553,125 @@ def _preflop(s, c):
 
 # ── postflop ─────────────────────────────────────────────────────────────────
 
+def _looseness(kind, big, street, size):
+    """How wide is the range behind this bet? 1.0 = it could be any hand,
+    small = only their best hands.
+
+    Before evidence: the minimum defence frequency for the bet size, which
+    assumes a normal mix of strong hands and bluffs. Then it moves with how
+    often this opponent makes this kind of bet: towards 1.0 if they make it
+    almost every time, towards a narrow range if they rarely do. Raises and
+    big bets start out narrow, because most players make them rarely."""
+    st = STATS
+    size = max(0.1, size)
+    base = min(1.0, DEFAULT_DEFENCE * (1 + 2 * size) / ((1 + size) ** 2))
+    # An opponent who raises a lot everywhere (preflop included) starts with
+    # looser guesses in every bucket; a passive one with tighter guesses.
+    overall = _rate(st["agg"], st["agg_n"], 0.30, 6)
+    boost = min(3.0, max(0.6, overall / 0.30))
+    if big:
+        # Overbets and big shoves: narrow unless they make them often, or have
+        # been caught making one with a weak hand.
+        f = _rate(st["big"], st["big_n"], min(0.60, 0.10 * boost), 5)
+        if f >= 0.20:
+            loose = base + (1.0 - base) * min(1.0, (f - 0.20) / 0.40)
+        else:
+            loose = base * max(0.25, f / 0.20)
+        weak_share = _rate(st["shown_big_weak"], st["shown_big_n"], 0.20, 3)
+        if weak_share > 0.20:
+            target = max(base, 0.80)
+            if target > loose:
+                loose += (target - loose) * min(1.0, (weak_share - 0.20) / 0.30)
+        else:
+            honest = max(LOOSE_MIN, f)
+            if loose > honest:
+                loose = honest + (loose - honest) * weak_share / 0.20
+        return loose
+    if kind == "raise":
+        f, usual = _rate(st["rz"], st["rz_n"], min(0.60, 0.12 * boost), 6), 0.30
+    elif street == "flop":
+        f, usual = _rate(st["fbet"], st["fbet_n"], min(0.90, 0.50 * boost ** 0.5), 6), 0.50
+    else:
+        f, usual = _rate(st["lbet"], st["lbet_n"], min(0.90, 0.40 * boost ** 0.5), 6), 0.40
+    if f >= usual:
+        loose = base + (1.0 - base) * min(1.0, (f - usual) / (0.85 - usual))
+    else:
+        loose = base * max(0.25, f / usual)
+    # If their bets keep showing up strong at showdown, they bet honestly: read
+    # the bet as "the top f of their hands" (no bluffs in it) instead.
+    if street == "flop" and kind == "bet" and not big:
+        weak_share = _rate(st["shown_flop_weak"], st["shown_flop_n"], 0.30, 2)
+    else:
+        weak_share = _rate(st["shown_late_weak"], st["shown_late_n"], 0.30, 2)
+    honest = max(LOOSE_MIN, f)
+    if loose > honest:
+        loose = honest + (loose - honest) * min(1.0, weak_share / 0.30)
+    return loose
+
+
+def _read_bets(s, c):
+    """Combine everything the opponent did this hand into one number: how wide
+    their range still is (1.0 = any hand). Also says whether we were the last
+    raiser before the flop."""
+    st = STATS
+    me = c["me"]
+    loose = 1.0
+    was_aggressor = False
+    my_raise_seen = False
+    pre_freq = None
+    for a in s["action_log"]:
+        if a.get("street") != "preflop" or a.get("action") not in ("raise", "all_in"):
+            continue
+        if a.get("bot_id") == me:
+            was_aggressor = my_raise_seen = True
+            continue
+        was_aggressor = False
+        if my_raise_seen:                                 # they re-raised us
+            f = _rate(st["raise_3bet"] + st["raise_shove"], st["raise_n"], 0.12, 6)
+        elif s["sb_seat"] != s["seat_to_act"]:            # they opened from the small blind
+            f = _rate(st["open_raise"] + st["open_shove"], st["open_n"], 0.70, 6)
+        else:
+            f = 0.30
+        pre_freq = f if pre_freq is None else min(pre_freq, f)
+    if pre_freq is not None:                              # preflop strength carries over only partly
+        loose *= max(0.5, pre_freq ** 0.25)
+
+    recs = [r for r in _replay(s["action_log"], me) if r["kind"] != "none"]
+    for idx, r in enumerate(recs):
+        pending = c["owed"] > 0 and idx == len(recs) - 1 and r["street"] == s["street"]
+        size, big = r["size"], r["big"]
+        if pending:                                       # the bet in front of us: use the live numbers
+            size = c["owed"] / float(max(1, c["pot"] - c["owed"]))
+            big = size > BIG_BET or (c["opp_all_in"] and size > 0.75)
+        li = _looseness(r["kind"], big, r["street"], size)
+        loose *= li if pending else li ** 0.5             # earlier streets count for less
+    return max(LOOSE_MIN, min(1.0, loose)), was_aggressor
+
+
+def _commit_premium(c, risk):
+    """Extra equity asked for when a lot of big blinds go in compared with the
+    pot. Zero for small bets and short stacks, at most COMMIT_PREMIUM. It fades
+    against an opponent who has proven to raise all the time: their big bets
+    are not strength, and waiting only gives them free cards."""
+    before = max(1, c["pot"] - c["owed"])
+    overall = _rate(STATS["agg"], STATS["agg_n"], 0.30, 6)
+    fade = min(1.0, max(0.0, 1.0 - (overall - 0.30) / 0.30))
+    return (COMMIT_PREMIUM * fade * min(1.0, (risk / float(c["bb"])) / 80.0)
+            * min(1.0, (risk / float(before)) / 1.5))
+
+
 def _postflop(s, c, deadline):
     st = STATS
     pot, owed, stack = c["pot"], c["owed"], c["stack"]
     street = s["street"]
 
-    # How strong does their betting say they are? More bets -> best of more hands.
-    pressure = 0.0
-    was_aggressor = False
-    for a in s["action_log"]:
-        act = a.get("action")
-        if act not in ("raise", "all_in"):
-            continue
-        if a.get("bot_id") == c["me"]:
-            if a.get("street") == "preflop":
-                was_aggressor = True
-            continue
-        if a.get("street") == "preflop":
-            pressure += 0.5
-            was_aggressor = False
-        else:
-            pressure += 1.0
-    if owed > 0 and (owed >= 0.75 * (pot - owed) or c["opp_all_in"]):
-        pressure += 0.5
-    aggr = _rate(st["post_aggr"], st["post_n"], 0.30, 12)       # how often they bet at all
-    scale = min(1.3, max(0.35, 0.30 / max(aggr, 0.01)))
-    k = min(5, 1 + int(pressure * scale + 0.5))
-
+    loose, was_aggressor = _read_bets(s, c)
+    k = min(float(MAX_K), (2.0 - loose) / loose)      # range width -> "best of k hands"
     eq, n = _equity(s["your_cards"], s["community_cards"], k, deadline)
     fold_to_bet = _rate(st["bet_fold"], st["bet_faced_n"], 0.40, 6)
-    dbg = {"eq": round(eq, 3), "k": k, "n": n, "ftb": round(fold_to_bet, 2)}
+    dbg = {"eq": round(eq, 3), "loose": round(loose, 2), "k": round(k, 1), "n": n,
+           "ftb": round(fold_to_bet, 2)}
+    deep = stack / float(c["bb"]) > 40
 
     if owed == 0:
         if c["opp_all_in"]:
@@ -478,7 +682,7 @@ def _postflop(s, c, deadline):
             if fold_to_bet < 0.20:
                 frac += 0.25
             bet = int(frac * pot)
-            if bet >= 0.6 * stack:
+            if bet >= 0.6 * stack and (not deep or eq >= value_at + 2 * _commit_premium(c, stack)):
                 return {"action": "all_in"}, dbg
             return {"action": "raise", "amount": s["current_bet"] + bet}, dbg
         # Bluffs only where the counters say they fold often enough to pay for it.
@@ -492,16 +696,21 @@ def _postflop(s, c, deadline):
         return {"action": "check"}, dbg
 
     odds = owed / float(pot + owed)
+    premium = _commit_premium(c, min(owed, stack))
     dbg["odds"] = round(odds, 3)
+    dbg["prem"] = round(premium, 3)
     if c["opp_all_in"] or owed >= stack:
-        return ({"action": "call"} if eq >= odds + 0.02 else {"action": "fold"}), dbg
+        return ({"action": "call"} if eq >= odds + 0.02 + premium else {"action": "fold"}), dbg
     if eq >= 0.78:
         raise_to = s["current_bet"] + int(0.75 * (pot + owed))
         if raise_to - c["my_bet"] >= 0.5 * stack:
-            return {"action": "all_in"}, dbg
+            # a deep stack goes in only well ahead; otherwise keep the pot smaller
+            if not deep or eq >= 0.78 + _commit_premium(c, stack):
+                return {"action": "all_in"}, dbg
+            return {"action": "call"}, dbg
         return {"action": "raise", "amount": raise_to}, dbg
     margin = 0.0 if street == "river" else 0.02
-    if eq >= odds + margin:
+    if eq >= odds + margin + premium:
         return {"action": "call"}, dbg
     return {"action": "fold"}, dbg
 
@@ -554,6 +763,7 @@ def _think(s, t0):
     except Exception:
         pass                                            # counters are optional; decisions are not
     c = _context(s)
+    _BOARDS[s["hand_num"]] = list(s["community_cards"])
     if s["street"] == "preflop":
         act, dbg = _preflop(s, c)
     else:
