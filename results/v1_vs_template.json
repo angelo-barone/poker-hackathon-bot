@@ -1,0 +1,31 @@
+{
+  "bot": "my_bots/v1",
+  "opponent": "bots/template",
+  "mode": "in-process",
+  "pairs": 250,
+  "matches": 500,
+  "match_wins": 500,
+  "match_win_rate": 1.0,
+  "ci95": [
+    0.9924,
+    1.0
+  ],
+  "pairings": {
+    "win": 250,
+    "draw": 0,
+    "loss": 0
+  },
+  "points_per_pairing": 1.0,
+  "decisions": 25461,
+  "crashes": 0,
+  "timeouts": 0,
+  "restarts": 0,
+  "corrected_actions": 0,
+  "free_folds": 0,
+  "slowest_ms": 22.2,
+  "avg_ms": 0.14,
+  "avg_hands": 99.0,
+  "hand_limit_matches": 0,
+  "runner_crashes": 0,
+  "seconds": 4.1
+}
