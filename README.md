@@ -1,4 +1,35 @@
-# Poker Bot Hackathon: Starter Kit
+# Poker bot: im_just_in_mech_eng
+
+My solo entry for the Poker Bot Hackathon run by IEEE uOttawa and Larus Technologies on November 21, 2026. The bot plays heads up No Limit Texas Hold'em.
+
+**Result:** 1st of 21 in the round robin qualification, 2nd overall after the final, and the Best Exploitative Algorithm prize.
+
+## How the bot plays
+
+The entry is `my_bots/im_just_in_mech_eng/bot.py` (version v5a, tag `safe-v5a`). The top of that file explains it in plain words.
+
+- Estimates its chance of winning by simulating the rest of the hand up to 1,500 times, then compares that with the price of calling.
+- Reads each opponent from counts of how often they bet, raise, fold and go all in during the match, plus the hands they show at showdown. It starts from a balanced default and adjusts in small, capped steps.
+- Picks bet sizes from the street and the board rather than hand strength, so strong hands and bluffs look the same.
+- At 15 big blinds or less it plays all in or fold from a precomputed equilibrium table.
+- The bot uses no AI and no network, as the rules required.
+
+## How it was tested
+
+- More than 40 practice opponents (`sparring/`) in duplicate matches: the same cards are played twice with the seats swapped, which cancels out much of the luck.
+- More than 14 million test decisions with no crashes, timeouts or illegal actions, and 588 matches in the organizers' Docker sandbox from a fresh download of this repo.
+- A change was kept only if it beat the previous version on the same deals. `dev/` holds the earlier and rejected versions.
+
+## How it was made
+
+Built with Claude (Claude Code). I directed the strategy and the testing plan and decided what stayed in the bot.
+
+The starter kit, game engine and sandbox come from the organizers (see Credits below and `LICENSE`). The organizers' original README follows.
+
+---
+
+## Starter kit from the organizers
+
 
 **IEEE uOttawa × LARUS** · Saturday, November 21 · 9 AM to 10 PM · STEM 117 · teams of 1-2
 
